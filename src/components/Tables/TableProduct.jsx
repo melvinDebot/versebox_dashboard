@@ -97,7 +97,7 @@ const TableProduct = ({ list }) => {
           </div>
         </div>
       ))}
-      <div className="flex justify-center mt-4 space-x-2">
+      <div className="flex justify-center mt-4 space-x-2 flex-wrap gap-5">
         {Array.from(
           { length: Math.ceil(filteredList.length / itemsPerPage) },
           (_, index) => (
