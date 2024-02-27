@@ -2,14 +2,14 @@ import { PropTypes } from "prop-types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const TableProduct = ({ list }) => {
+const TableEvent = ({ list }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
   // // Filtrer les éléments en fonction du terme de recherche
-  const filteredList = Object.values(list).filter(
+  const filteredList = list.filter(
     (item) =>
       item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -24,10 +24,10 @@ const TableProduct = ({ list }) => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default">
       <div className="py-6 px-4 md:px-6 xl:px-7.5">
-        <h4 className="text-xl font-semibold text-black ">Top Products</h4>
+        <h4 className="text-xl font-semibold text-black ">Event list</h4>
         <input
           type="text"
-          placeholder="Rechercher un product..."
+          placeholder="Rechercher un event..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
@@ -36,23 +36,23 @@ const TableProduct = ({ list }) => {
 
       <div className="grid grid-cols-6 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5">
         <div className="col-span-3 flex items-center">
-          <p className="font-medium">Product Name</p>
+          <p className="font-medium">Event Name</p>
         </div>
         <div className="col-span-2 hidden items-center sm:flex">
-          <p className="font-medium">Category</p>
+          <p className="font-medium">Date</p>
         </div>
         <div className="col-span-1 flex items-center">
-          <p className="font-medium">Price</p>
+          <p className="font-medium">Discount Text</p>
         </div>
         <div className="col-span-1 flex items-center">
-          <p className="font-medium">Sold</p>
+          <p className="font-medium">Location</p>
         </div>
         <div className="col-span-1 flex items-center">
           <p className="font-medium">Actions</p>
         </div>
       </div>
 
-      {currentItems.map((product, key) => (
+      {currentItems.map((event, key) => (
         <div
           className="grid grid-cols-6 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5"
           key={key}
@@ -60,25 +60,25 @@ const TableProduct = ({ list }) => {
           <div className="col-span-3 flex items-center">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className=" rounded-md">
-                <img src={product.img} alt="Product" className="object-cover" />
+                <img src={event.img} alt="Product" className="object-cover" />
               </div>
-              <p className="text-sm text-black ">{product.title}</p>
+              <p className="text-sm text-black ">{event.title}</p>
             </div>
           </div>
           <div className="col-span-2 hidden items-center sm:flex">
-            <p className="text-sm text-black ">{product.category}</p>
+            <p className="text-sm text-black ">{event.startDate}</p>
           </div>
           <div className="col-span-1 flex items-center">
-            <p className="text-sm text-black ">{product.price}€</p>
+            <p className="text-sm text-black ">
+              {event.subscriberDiscountText}
+            </p>
           </div>
           <div className="col-span-1 flex items-center">
-            <p className="text-sm text-meta-3 ">{product.subcriberPrice}€</p>
+            <p className="text-sm ">{event.location}</p>
           </div>
           <div
             className="col-span-1 flex items-center"
-            onClick={() =>
-              navigate(`/update-product/${key}`, { state: product })
-            }
+            onClick={() => navigate(`/update-event/${key}`, { state: event })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -115,8 +115,8 @@ const TableProduct = ({ list }) => {
   );
 };
 
-export default TableProduct;
+export default TableEvent;
 
-TableProduct.propTypes = {
+TableEvent.propTypes = {
   list: PropTypes.array,
-};
+}

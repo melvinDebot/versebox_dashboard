@@ -4,21 +4,20 @@ import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 import Alert from "../components/Alert/Alert";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useFirebase } from "../context/FirebaseContext";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
-const CreateEvent = () => {
-  const [objectChallenge, setObjectChallenge] = useState({});
-  const { events } = useFirebase();
+const UpdateEvent = () => {
+  let { id } = useParams();
+  const location = useLocation();
+
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
+  const [objectEvent, setObjectEvent] = useState(location.state);
+
   const setEvent = () => {
-    if (objectChallenge.title !== "") {
-      update(ref(db, `/Events/${events.length}`), {
-        ...objectChallenge,
-        link: objectChallenge.link || "",
-        subscriberDiscountLink: objectChallenge.subscriberDiscountLink || "",
-        subscriberDiscountText: objectChallenge.subscriberDiscountText || "",
+    if (objectEvent.title !== "") {
+      update(ref(db, `/Events/${id}`), {
+        ...objectEvent,
       });
       setShowAlert(true);
       setTimeout(() => {
@@ -28,6 +27,7 @@ const CreateEvent = () => {
       alert("Veuillez ajouter une categorie");
     }
   };
+
   return (
     <DefaultLayout>
       {showAlert && (
@@ -44,7 +44,7 @@ const CreateEvent = () => {
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default">
             <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Create new event</h3>
+              <h3 className="font-medium text-black ">Update event {id}</h3>
             </div>
             <div className="p-6.5">
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -54,10 +54,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.title}
+                    value={objectEvent.title}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         title: e.target.value,
                       });
                     }}
@@ -73,11 +73,11 @@ const CreateEvent = () => {
                     Description <span className="text-meta-1">*</span>
                   </label>
                   <textarea
-                    value={objectChallenge.description}
+                    value={objectEvent.description}
                     rows={6}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         description: e.target.value,
                       });
                     }}
@@ -93,10 +93,10 @@ const CreateEvent = () => {
                   <label className="mb-2.5 block text-black ">Link</label>
                   <input
                     type="text"
-                    value={objectChallenge.link}
+                    value={objectEvent.link}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         link: e.target.value,
                       });
                     }}
@@ -113,10 +113,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountLink}
+                    value={objectEvent.subscriberDiscountLink}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         subscriberDiscountLink: e.target.value,
                       });
                     }}
@@ -133,10 +133,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountText}
+                    value={objectEvent.subscriberDiscountText}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         subscriberDiscountText: e.target.value,
                       });
                     }}
@@ -153,10 +153,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.location}
+                    value={objectEvent.location}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         location: e.target.value,
                       });
                     }}
@@ -173,10 +173,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="date"
-                    value={objectChallenge.startDate}
+                    value={objectEvent.startDate}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         startDate: e.target.value,
                       });
                     }}
@@ -192,10 +192,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="date"
-                    value={objectChallenge.endDate}
+                    value={objectEvent.endDate}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         endDate: e.target.value,
                       });
                     }}
@@ -211,10 +211,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.img}
+                    value={objectEvent.img}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectEvent({
+                        ...objectEvent,
                         img: e.target.value,
                       });
                     }}
@@ -228,7 +228,7 @@ const CreateEvent = () => {
                 onClick={() => setEvent()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
-                Create event
+                Update event
               </button>
             </div>
           </div>
@@ -238,4 +238,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent;
+export default UpdateEvent;

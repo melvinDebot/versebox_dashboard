@@ -4,21 +4,20 @@ import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 import Alert from "../components/Alert/Alert";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useFirebase } from "../context/FirebaseContext";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
-const CreateEvent = () => {
-  const [objectChallenge, setObjectChallenge] = useState({});
-  const { events } = useFirebase();
+const UpdateProduct = () => {
+  let { id } = useParams();
+  const location = useLocation();
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
-  const setEvent = () => {
-    if (objectChallenge.title !== "") {
-      update(ref(db, `/Events/${events.length}`), {
-        ...objectChallenge,
-        link: objectChallenge.link || "",
-        subscriberDiscountLink: objectChallenge.subscriberDiscountLink || "",
-        subscriberDiscountText: objectChallenge.subscriberDiscountText || "",
+
+  const [objectProduct, setObjectProduct] = useState(location.state);
+
+  const setProduct = () => {
+    if (objectProduct.title !== "") {
+      update(ref(db, `/Store/${id}`), {
+        ...objectProduct,
       });
       setShowAlert(true);
       setTimeout(() => {
@@ -28,40 +27,40 @@ const CreateEvent = () => {
       alert("Veuillez ajouter une categorie");
     }
   };
+
   return (
     <DefaultLayout>
       {showAlert && (
         <Alert
-          message="Challenge updated successfully"
+          message="Add product success!"
           type="success"
-          description="Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry."
+          description="You have successfully added a new product. You will be redirected to the dashboard."
         />
       )}
-      <Breadcrumb pageName="Create event" />
+      <Breadcrumb pageName="Update Product" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default">
             <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Create new event</h3>
+              <h3 className="font-medium text-black ">Update product {id}</h3>
             </div>
             <div className="p-6.5">
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
                   <label className="mb-2.5 block text-black ">
-                    Name Event <span className="text-meta-1">*</span>
+                    Title <span className="text-meta-1">*</span>
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.title}
+                    value={objectProduct.title}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectProduct({
+                        ...objectProduct,
                         title: e.target.value,
                       });
                     }}
-                    placeholder="Name Event"
+                    placeholder="add a title"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -73,34 +72,16 @@ const CreateEvent = () => {
                     Description <span className="text-meta-1">*</span>
                   </label>
                   <textarea
-                    value={objectChallenge.description}
                     rows={6}
+                    value={objectProduct.description}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectProduct({
+                        ...objectProduct,
                         description: e.target.value,
                       });
                     }}
                     type="text"
-                    placeholder="Description"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">Link</label>
-                  <input
-                    type="text"
-                    value={objectChallenge.link}
-                    onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
-                        link: e.target.value,
-                      });
-                    }}
-                    placeholder="add link"
+                    placeholder="add a description"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -109,18 +90,38 @@ const CreateEvent = () => {
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
                   <label className="mb-2.5 block text-black ">
-                    Link subscriber
+                    Link <span className="text-meta-1">*</span>
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountLink}
+                    value={objectProduct.link}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectProduct({
+                        ...objectProduct,
+                        link: e.target.value,
+                      });
+                    }}
+                    placeholder="add a link product"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full">
+                  <label className="mb-2.5 block text-black ">
+                    Link subscriber <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={objectProduct.subscriberDiscountLink}
+                    onChange={(e) => {
+                      setObjectProduct({
+                        ...objectProduct,
                         subscriberDiscountLink: e.target.value,
                       });
                     }}
-                    placeholder="add link subscriber"
+                    placeholder="add a link subscriber"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -133,14 +134,14 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountText}
+                    value={objectProduct.subscriberDiscountText}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectProduct({
+                        ...objectProduct,
                         subscriberDiscountText: e.target.value,
                       });
                     }}
-                    placeholder="add text subscriber"
+                    placeholder="add a text subscriber"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -149,18 +150,19 @@ const CreateEvent = () => {
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
                   <label className="mb-2.5 block text-black ">
-                    Location <span className="text-meta-1">*</span>
+                    Price <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    type="text"
-                    value={objectChallenge.location}
+                    type="number"
+                    step="0.01"
+                    defaultValue={objectProduct.price}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
-                        location: e.target.value,
+                      setObjectProduct({
+                        ...objectProduct,
+                        price: parseFloat(e.target.value),
                       });
                     }}
-                    placeholder="add location"
+                    placeholder="add a price"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -169,36 +171,38 @@ const CreateEvent = () => {
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
                   <label className="mb-2.5 block text-black ">
-                    start date <span className="text-meta-1">*</span>
+                    Price Subscriber <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    type="date"
-                    value={objectChallenge.startDate}
+                    type="number"
+                    step="0.01"
+                    defaultValue={objectProduct.subcriberPrice}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
-                        startDate: e.target.value,
+                      setObjectProduct({
+                        ...objectProduct,
+                        subcriberPrice: parseFloat(e.target.value),
                       });
                     }}
+                    placeholder="add a price subscriber"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
               </div>
-
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
                   <label className="mb-2.5 block text-black ">
-                    end date <span className="text-meta-1">*</span>
+                    Score User <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    type="date"
-                    value={objectChallenge.endDate}
+                    type="number"
+                    value={objectProduct.score}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
-                        endDate: e.target.value,
+                      setObjectProduct({
+                        ...objectProduct,
+                        score: parseInt(e.target.value, 10),
                       });
                     }}
+                    placeholder="add a score user"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
@@ -211,24 +215,87 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.img}
+                    value={objectProduct.img}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setObjectProduct({
+                        ...objectProduct,
                         img: e.target.value,
                       });
                     }}
-                    placeholder="add link img"
+                    placeholder="add a link img"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
                 </div>
               </div>
 
+              <div className="mb-4.5">
+                <label className="mb-2.5 block text-black "> Category </label>
+
+                <div className="relative z-20 bg-transparent">
+                  <select
+                    onChange={(e) => {
+                      setObjectProduct({
+                        ...objectProduct,
+                        category: e.target.value,
+                      });
+                    }}
+                    value={objectProduct.category}
+                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary `}
+                  >
+                    <option
+                      value=""
+                      disabled
+                      className="text-body dark:text-bodydark"
+                    >
+                      Select your category
+                    </option>
+                    <option
+                      value="music"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Music
+                    </option>
+                    <option
+                      value="games"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Games
+                    </option>
+                    <option
+                      value="books"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Books
+                    </option>
+                  </select>
+
+                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
+                    <svg
+                      className="fill-current"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g opacity="0.8">
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
+                          fill=""
+                        ></path>
+                      </g>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
               <button
-                onClick={() => setEvent()}
+                onClick={() => setProduct()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
-                Create event
+                update product
               </button>
             </div>
           </div>
@@ -238,4 +305,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent;
+export default UpdateProduct;

@@ -13,9 +13,13 @@ import TablesUser from "./pages/TablesUser";
 import TablesEvent from "./pages/TablesEvent";
 import TablesStore from "./pages/TableStore";
 import Calendar from "./pages/Calendar";
+import UpdateChallenge from "./pages/UpdateChallenge";
 import CreateChallenge from "./pages/CreateChallenge";
 import CreateEvent from "./pages/CreateEvent";
 import CreateProduct from "./pages/CreateProduct";
+import UpdateProduct from "./pages/UpdateProduct";
+import UpdateEvent from "./pages/UpdateEvent";
+import UpdateUser from "./pages/UpdateUser";
 
 function App() {
   //eslint-disable-next-line
@@ -52,6 +56,14 @@ function App() {
         <Route path="/tables-event" exact element={<TablesEvent />} />
         <Route path="/tables-store" exact element={<TablesStore />} />
         <Route path="/calendar" exact element={<Calendar />} />
+        <Route
+          path="/update-challenge/:id"
+          exact
+          element={<UpdateChallenge />}
+        />
+        <Route path="/update-user/:id" exact element={<UpdateUser />} />
+        <Route path="/update-event/:id" exact element={<UpdateEvent />} />
+        <Route path="/update-product/:id" exact element={<UpdateProduct />} />
         <Route path="/create-challenge" exact element={<CreateChallenge />} />
         <Route path="/create-event" exact element={<CreateEvent />} />
         <Route path="/create-product" exact element={<CreateProduct />} />

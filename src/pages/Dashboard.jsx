@@ -33,11 +33,6 @@ const Dashboard = () => {
       categoriesCount[category]++;
     });
 
-    console.log("Nombre d'utilisateurs par catégorie :");
-    Object.entries(categoriesCount).forEach(([category, count]) => {
-      console.log(`${category} : ${count}`);
-    });
-
     // Créer un tableau des nombres d'utilisateurs par catégorie
     const countsArray = Object.values(categoriesCount);
 
@@ -56,7 +51,7 @@ const Dashboard = () => {
           levelUp
         >
           <svg
-            className="fill-primary dark:fill-white"
+            className="fill-primary "
             width="22"
             height="16"
             viewBox="0 0 22 16"
@@ -80,7 +75,7 @@ const Dashboard = () => {
           levelUp
         >
           <svg
-            className="fill-primary dark:fill-white"
+            className="fill-primary "
             width="20"
             height="22"
             viewBox="0 0 20 22"
@@ -108,7 +103,7 @@ const Dashboard = () => {
           levelUp
         >
           <svg
-            className="fill-primary dark:fill-white"
+            className="fill-primary "
             width="22"
             height="22"
             viewBox="0 0 22 22"
@@ -132,7 +127,7 @@ const Dashboard = () => {
           levelDown
         >
           <svg
-            className="fill-primary dark:fill-white"
+            className="fill-primary "
             width="22"
             height="18"
             viewBox="0 0 22 18"

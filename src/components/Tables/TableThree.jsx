@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { PropTypes } from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 const TableThree = ({ list }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
   // // Filtrer les éléments en fonction du terme de recherche
   const filteredList = Object.values(list).filter(
@@ -27,7 +29,7 @@ const TableThree = ({ list }) => {
       <div className="max-w-full overflow-x-auto">
         <input
           type="text"
-          placeholder="Rechercher un verset..."
+          placeholder="Rechercher un uuid..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
@@ -42,7 +44,7 @@ const TableThree = ({ list }) => {
                 name
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
-                score
+                Actions
               </th>
             </tr>
           </thead>
@@ -57,8 +59,28 @@ const TableThree = ({ list }) => {
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black ">{item.user.nameUser}</p>
                 </td>
-                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black ">{item.user.score}</p>
+                <td
+                  className="border-b border-[#eee] py-5 px-4 dark:border-strokedark"
+                  onClick={() =>
+                    navigate(`/update-user/${item.user.uuidUser}`, {
+                      state: item.user,
+                    })
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                    />
+                  </svg>
                 </td>
               </tr>
             ))}
@@ -87,4 +109,4 @@ export default TableThree;
 
 TableThree.propTypes = {
   list: PropTypes.object,
-}
+};

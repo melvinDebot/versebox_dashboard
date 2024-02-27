@@ -185,7 +185,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       </clipPath>
                     </defs>
                   </svg>
-                  Update challenge
+                  Create challenge
                 </NavLink>
               </li>
               <li>
@@ -225,7 +225,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       </clipPath>
                     </defs>
                   </svg>
-                  Update event
+                  Create event
                 </NavLink>
               </li>
 
@@ -266,7 +266,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       </clipPath>
                     </defs>
                   </svg>
-                  Update create-product
+                  Create product
                 </NavLink>
               </li>
             </ul>

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { PropTypes } from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 const TableChallengeDetails = ({ list }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
   // Filtrer les éléments en fonction du terme de recherche
   const filteredList = list.filter((item) =>
@@ -59,7 +61,12 @@ const TableChallengeDetails = ({ list }) => {
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
-                    <button className="hover:text-primary">
+                    <button
+                      className="hover:text-primary"
+                      onClick={() =>
+                        navigate(`/update-challenge/${key}`, { state: item })
+                      }
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -120,4 +127,4 @@ export default TableChallengeDetails;
 
 TableChallengeDetails.propTypes = {
   list: PropTypes.array,
-}
+};

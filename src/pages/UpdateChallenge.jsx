@@ -1,35 +1,29 @@
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useFirebase } from "../context/FirebaseContext";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 import Alert from "../components/Alert/Alert";
 
-const CreateChallenge = () => {
-  const { data } = useFirebase();
+const UpdateChallenge = () => {
   const navigate = useNavigate();
-  const [objectChallenge, setObjectChallenge] = useState({});
+  let { id } = useParams();
+  const location = useLocation();
+  const [objectChallenge, setObjectChallenge] = useState(location.state);
   const [showAlert, setShowAlert] = useState(false);
 
   const setChallenge = () => {
-    if (objectChallenge.categories[0] !== undefined) {
-      update(
-        ref(
-          db,
-          `/dataIHM/${objectChallenge.categories[0]}/${data[objectChallenge.categories[0]].length}/`,
-        ),
-        {
-          ...objectChallenge,
-          categories:
-            objectChallenge?.categories[0] === "relationel"
-              ? ["relationnel"]
-              : [objectChallenge.categories[0]],
-          like: 0,
-          unlike: 0,
-        },
-      );
+    if (location.state.categories[0] != undefined) {
+      update(ref(db, `/dataIHM/${location.state.categories[0]}/${id}/`), {
+        ...objectChallenge,
+        categories:
+          location.state.categories[0] === "relationel"
+            ? ["relationnel"]
+            : location.state.categories[0],
+        like: 0,
+        unlike: 0,
+      });
       setShowAlert(true);
       setTimeout(() => {
         navigate(`/dashboard`);
@@ -49,13 +43,15 @@ const CreateChallenge = () => {
             industry."
         />
       )}
-      <Breadcrumb pageName="Create challenge" />
+      <Breadcrumb
+        pageName={`challenge ${id} ${location.state.categories[0]}`}
+      />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default">
             <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Create new challenge</h3>
+              <h3 className="font-medium text-black ">Update challenge</h3>
             </div>
             <div className="p-6.5">
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -64,7 +60,7 @@ const CreateChallenge = () => {
                     Verset <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    value={objectChallenge.verse}
+                    value={location.state.verse}
                     type="text"
                     placeholder="Mathieu 2:11"
                     onChange={(e) => {
@@ -83,7 +79,7 @@ const CreateChallenge = () => {
                 </label>
                 <textarea
                   rows={6}
-                  value={objectChallenge.verseText}
+                  value={location.state.verseText}
                   placeholder="Type your content"
                   onChange={(e) => {
                     setObjectChallenge({
@@ -106,7 +102,7 @@ const CreateChallenge = () => {
                       verseDescription: e.target.value,
                     });
                   }}
-                  value={objectChallenge.verseDescription}
+                  value={location.state.verseDescription}
                   placeholder="Type your explication"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -123,7 +119,7 @@ const CreateChallenge = () => {
                       challenge: e.target.value,
                     });
                   }}
-                  value={objectChallenge.challenge}
+                  value={location.state.challenge}
                   placeholder="Type your challenge"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -134,6 +130,7 @@ const CreateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
+                    value={location.state.categories[0]}
                     onChange={(e) => {
                       setObjectChallenge({
                         ...objectChallenge,
@@ -232,7 +229,7 @@ const CreateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={objectChallenge.point}
+                    value={location.state.point ? location.state.point : ""}
                     onChange={(e) => {
                       setObjectChallenge({
                         ...objectChallenge,
@@ -295,7 +292,7 @@ const CreateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={objectChallenge.level}
+                    value={location.state.level ? location.state.level : ""}
                     onChange={(e) => {
                       setObjectChallenge({
                         ...objectChallenge,
@@ -357,7 +354,7 @@ const CreateChallenge = () => {
                 onClick={() => setChallenge()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
-                Create challenge
+                Update challenge
               </button>
             </div>
           </div>
@@ -367,4 +364,4 @@ const CreateChallenge = () => {
   );
 };
 
-export default CreateChallenge;
+export default UpdateChallenge;

@@ -73,4 +73,4 @@ export default TableChallenge;
 
 TableChallenge.propTypes = {
   list: PropTypes.object,
-}
+};
