@@ -3,7 +3,7 @@ import TableProduct from "../components/Tables/TableProduct";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import { useFirebase } from "../context/FirebaseContext";
 
-const TablesStore = () => {
+const Store = () => {
   const { store } = useFirebase();
   return (
     <DefaultLayout>
@@ -15,4 +15,4 @@ const TablesStore = () => {
   );
 };
 
-export default TablesStore;
+export default Store;

@@ -10,13 +10,13 @@ const UpdateChallenge = () => {
   const navigate = useNavigate();
   let { id } = useParams();
   const location = useLocation();
-  const [objectChallenge, setObjectChallenge] = useState(location.state);
+  const [updatedChallengeData, setUpdatedChallengeData] = useState(location.state);
   const [showAlert, setShowAlert] = useState(false);
 
-  const setChallenge = () => {
+  const updatedChallengeToBdd = () => {
     if (location.state.categories[0] != undefined) {
       update(ref(db, `/dataIHM/${location.state.categories[0]}/${id}/`), {
-        ...objectChallenge,
+        ...updatedChallengeData,
         categories:
           location.state.categories[0] === "relationel"
             ? ["relationnel"]
@@ -64,8 +64,8 @@ const UpdateChallenge = () => {
                     type="text"
                     placeholder="Mathieu 2:11"
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setUpdatedChallengeData({
+                        ...updatedChallengeData,
                         verse: e.target.value,
                       });
                     }}
@@ -82,8 +82,8 @@ const UpdateChallenge = () => {
                   value={location.state.verseText}
                   placeholder="Type your content"
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setUpdatedChallengeData({
+                      ...updatedChallengeData,
                       verseText: e.target.value,
                     });
                   }}
@@ -97,8 +97,8 @@ const UpdateChallenge = () => {
                 <textarea
                   rows={6}
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setUpdatedChallengeData({
+                      ...updatedChallengeData,
                       verseDescription: e.target.value,
                     });
                   }}
@@ -114,8 +114,8 @@ const UpdateChallenge = () => {
                 <textarea
                   rows={6}
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setUpdatedChallengeData({
+                      ...updatedChallengeData,
                       challenge: e.target.value,
                     });
                   }}
@@ -132,8 +132,8 @@ const UpdateChallenge = () => {
                   <select
                     value={location.state.categories[0]}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setUpdatedChallengeData({
+                        ...updatedChallengeData,
                         categories: [e.target.value],
                       });
                     }}
@@ -231,8 +231,8 @@ const UpdateChallenge = () => {
                   <select
                     value={location.state.point ? location.state.point : ""}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setUpdatedChallengeData({
+                        ...updatedChallengeData,
                         point: parseInt(e.target.value, 10),
                       });
                     }}
@@ -294,8 +294,8 @@ const UpdateChallenge = () => {
                   <select
                     value={location.state.level ? location.state.level : ""}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setUpdatedChallengeData({
+                        ...updatedChallengeData,
                         level: e.target.value,
                       });
                     }}
@@ -351,7 +351,7 @@ const UpdateChallenge = () => {
               </div>
 
               <button
-                onClick={() => setChallenge()}
+                onClick={() => updatedChallengeToBdd()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
                 Update challenge

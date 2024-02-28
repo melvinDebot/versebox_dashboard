@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PropTypes } from "prop-types";
 import { useNavigate } from "react-router-dom";
 
-const TableThree = ({ list }) => {
+const TableUser = ({ list }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
@@ -105,8 +105,8 @@ const TableThree = ({ list }) => {
   );
 };
 
-export default TableThree;
+export default TableUser;
 
-TableThree.propTypes = {
+TableUser.propTypes = {
   list: PropTypes.object,
 };

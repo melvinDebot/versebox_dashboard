@@ -2,7 +2,7 @@ import { PropTypes } from "prop-types";
 
 import { useState } from "react";
 
-const TableOne = ({ numberUser, numberChallenge }) => {
+const TableStatistics = ({ numberUser, numberChallenge }) => {
   const [brandData] = useState([
     {
       name: "Challenge",
@@ -66,9 +66,9 @@ const TableOne = ({ numberUser, numberChallenge }) => {
   );
 };
 
-export default TableOne;
+export default TableStatistics;
 
-TableOne.propTypes = {
+TableStatistics.propTypes = {
   numberUser: PropTypes.number,
   numberChallenge: PropTypes.number,
 };

@@ -11,9 +11,10 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const allowedEmails = ["Marvin@gmail.com"];
 
   const handleSignIn = () => {
-    if (email === "Marvin@gmail.com")
+    if (allowedEmails.includes(email)) {
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           const user = auth.currentUser;
@@ -33,6 +34,10 @@ const SignIn = () => {
           }, 500);
         })
         .catch((err) => alert(err.message));
+    } else {
+      alert("Email non autorisé");
+    }
+      
   };
 
   return (

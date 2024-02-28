@@ -8,24 +8,25 @@ import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/FirebaseContext";
 
 const CreateEvent = () => {
-  const [objectChallenge, setObjectChallenge] = useState({});
+  const [newEvent, setNewEvent] = useState({});
   const { events } = useFirebase();
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
-  const setEvent = () => {
-    if (objectChallenge.title !== "") {
+
+  const createEventToBdd = () => {
+    if (newEvent.title && newEvent.description && newEvent.location && newEvent.startDate && newEvent.endDate && newEvent.img) {
       update(ref(db, `/Events/${events.length}`), {
-        ...objectChallenge,
-        link: objectChallenge.link || "",
-        subscriberDiscountLink: objectChallenge.subscriberDiscountLink || "",
-        subscriberDiscountText: objectChallenge.subscriberDiscountText || "",
+        ...newEvent,
+        link: newEvent.link || "",
+        subscriberDiscountLink: newEvent.subscriberDiscountLink || "",
+        subscriberDiscountText: newEvent.subscriberDiscountText || "",
       });
       setShowAlert(true);
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
     } else {
-      alert("Veuillez ajouter une categorie");
+      alert("Veuillez remplir tous les champs");
     }
   };
   return (
@@ -34,8 +35,7 @@ const CreateEvent = () => {
         <Alert
           message="Challenge updated successfully"
           type="success"
-          description="Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry."
+          description="The challenge has been updated successfully. You will be redirected to the dashboard."
         />
       )}
       <Breadcrumb pageName="Create event" />
@@ -54,10 +54,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.title}
+                    value={newEvent.title}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         title: e.target.value,
                       });
                     }}
@@ -73,11 +73,11 @@ const CreateEvent = () => {
                     Description <span className="text-meta-1">*</span>
                   </label>
                   <textarea
-                    value={objectChallenge.description}
+                    value={newEvent.description}
                     rows={6}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         description: e.target.value,
                       });
                     }}
@@ -93,10 +93,10 @@ const CreateEvent = () => {
                   <label className="mb-2.5 block text-black ">Link</label>
                   <input
                     type="text"
-                    value={objectChallenge.link}
+                    value={newEvent.link}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         link: e.target.value,
                       });
                     }}
@@ -113,10 +113,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountLink}
+                    value={newEvent.subscriberDiscountLink}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         subscriberDiscountLink: e.target.value,
                       });
                     }}
@@ -133,10 +133,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.subscriberDiscountText}
+                    value={newEvent.subscriberDiscountText}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         subscriberDiscountText: e.target.value,
                       });
                     }}
@@ -153,10 +153,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.location}
+                    value={newEvent.location}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         location: e.target.value,
                       });
                     }}
@@ -173,10 +173,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="date"
-                    value={objectChallenge.startDate}
+                    value={newEvent.startDate}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         startDate: e.target.value,
                       });
                     }}
@@ -192,10 +192,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="date"
-                    value={objectChallenge.endDate}
+                    value={newEvent.endDate}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         endDate: e.target.value,
                       });
                     }}
@@ -211,10 +211,10 @@ const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectChallenge.img}
+                    value={newEvent.img}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewEvent({
+                        ...newEvent,
                         img: e.target.value,
                       });
                     }}
@@ -225,7 +225,7 @@ const CreateEvent = () => {
               </div>
 
               <button
-                onClick={() => setEvent()}
+                onClick={() => createEventToBdd()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
                 Create event

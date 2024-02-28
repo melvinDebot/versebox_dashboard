@@ -1,18 +1,18 @@
 import DefaultLayout from "../layout/DefaultLayout";
+import TableThree from "../components/Tables/TableUser";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import TableEvent from "../components/Tables/TableEvent";
 import { useFirebase } from "../context/FirebaseContext";
 
-const TablesEvent = () => {
-  const { events } = useFirebase();
+const Users = () => {
+  const { users } = useFirebase();
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Tables Events" />
+      <Breadcrumb pageName="Tables Users" />
       <div className="flex flex-col gap-10">
-        <TableEvent list={Object.values(events)} />
+        <TableThree list={Object.values(users)} />
       </div>
     </DefaultLayout>
   );
 };
 
-export default TablesEvent;
+export default Users;

@@ -1,12 +1,18 @@
 import { PropTypes } from "prop-types";
 
-const Alert = ({ message, type, description }) => {
+const Alert = ({ message, type, description, show }) => {
+
+
   return (
     <>
       {type === "success" && (
-        <div className="fixed top-10 left-0 right-0 flex justify-center z-999">
-          <div className="flex w-full max-w-xl border-l-6 border-[#34D399] bg-[#34D399] bg-green-500 px-7 py-8 shadow-md  md:p-9">
-            <div className="mr-5 flex h-9 w-full max-w-[36px] items-center justify-center rounded-lg bg-[#34D399]">
+        <div
+          className={`fixed top-10 left-0 right-0 flex justify-center z-999 transition-all duration-500 transform ${
+            show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"
+          }`}
+        >
+          <div className="flex w-full max-w-xl border-l-6 border-[#34D399] bg-[#34D399] bg-green-500 px-2 py-2 shadow-md md:p-9">
+            <div className="mr-5 flex h-9 w-full max-w-[32px] items-center justify-center rounded-lg bg-[#34D399]">
               <svg
                 width="16"
                 height="12"
@@ -22,7 +28,7 @@ const Alert = ({ message, type, description }) => {
               </svg>
             </div>
             <div className="w-full">
-              <h5 className="mb-3 text-lg font-semibold text-black ">
+              <h5 className="mb-3 text-lg font-semibold text-black">
                 {message}
               </h5>
               <p className="text-white leading-relaxed text-body">
@@ -42,4 +48,5 @@ Alert.propTypes = {
   message: PropTypes.string,
   type: PropTypes.string,
   description: PropTypes.string,
+  show: PropTypes.bool,
 };

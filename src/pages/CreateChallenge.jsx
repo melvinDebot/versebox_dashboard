@@ -10,22 +10,29 @@ import Alert from "../components/Alert/Alert";
 const CreateChallenge = () => {
   const { data } = useFirebase();
   const navigate = useNavigate();
-  const [objectChallenge, setObjectChallenge] = useState({});
+  const [newChallenge, setNewChallenge] = useState({});
   const [showAlert, setShowAlert] = useState(false);
 
-  const setChallenge = () => {
-    if (objectChallenge.categories[0] !== undefined) {
+  const createChallengeToBdd = () => {
+    if (newChallenge.verse &&
+    newChallenge.verseText &&
+    newChallenge.verseDescription &&
+    newChallenge.challenge &&
+      newChallenge.point &&
+    newChallenge.level &&
+    newChallenge.categories &&
+    newChallenge.categories.length > 0) {
       update(
         ref(
           db,
-          `/dataIHM/${objectChallenge.categories[0]}/${data[objectChallenge.categories[0]].length}/`,
+          `/dataIHM/${newChallenge.categories[0]}/${data[newChallenge.categories[0]].length}/`,
         ),
         {
-          ...objectChallenge,
+          ...newChallenge,
           categories:
-            objectChallenge?.categories[0] === "relationel"
+            newChallenge?.categories[0] === "relationel"
               ? ["relationnel"]
-              : [objectChallenge.categories[0]],
+              : [newChallenge.categories[0]],
           like: 0,
           unlike: 0,
         },
@@ -35,7 +42,7 @@ const CreateChallenge = () => {
         navigate(`/dashboard`);
       }, 3000);
     } else {
-      alert("Veuillez ajouter une categorie");
+      alert("Veuillez remplir tous les champs");
     }
   };
 
@@ -45,8 +52,8 @@ const CreateChallenge = () => {
         <Alert
           message="Challenge updated successfully"
           type="success"
-          description="Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry."
+          show={showAlert}
+          description="Your challenge has been updated successfully. You will be redirected to the dashboard in a few seconds.."
         />
       )}
       <Breadcrumb pageName="Create challenge" />
@@ -64,12 +71,12 @@ const CreateChallenge = () => {
                     Verset <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    value={objectChallenge.verse}
+                    value={newChallenge.verse}
                     type="text"
                     placeholder="Mathieu 2:11"
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewChallenge({
+                        ...newChallenge,
                         verse: e.target.value,
                       });
                     }}
@@ -83,11 +90,11 @@ const CreateChallenge = () => {
                 </label>
                 <textarea
                   rows={6}
-                  value={objectChallenge.verseText}
+                  value={newChallenge.verseText}
                   placeholder="Type your content"
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setNewChallenge({
+                      ...newChallenge,
                       verseText: e.target.value,
                     });
                   }}
@@ -101,12 +108,12 @@ const CreateChallenge = () => {
                 <textarea
                   rows={6}
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setNewChallenge({
+                      ...newChallenge,
                       verseDescription: e.target.value,
                     });
                   }}
-                  value={objectChallenge.verseDescription}
+                  value={newChallenge.verseDescription}
                   placeholder="Type your explication"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -118,12 +125,12 @@ const CreateChallenge = () => {
                 <textarea
                   rows={6}
                   onChange={(e) => {
-                    setObjectChallenge({
-                      ...objectChallenge,
+                    setNewChallenge({
+                      ...newChallenge,
                       challenge: e.target.value,
                     });
                   }}
-                  value={objectChallenge.challenge}
+                  value={newChallenge.challenge}
                   placeholder="Type your challenge"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -135,8 +142,8 @@ const CreateChallenge = () => {
                 <div className="relative z-20 bg-transparent">
                   <select
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewChallenge({
+                        ...newChallenge,
                         categories: [e.target.value],
                       });
                     }}
@@ -232,10 +239,10 @@ const CreateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={objectChallenge.point}
+                    value={newChallenge.point}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewChallenge({
+                        ...newChallenge,
                         point: parseInt(e.target.value, 10),
                       });
                     }}
@@ -295,10 +302,10 @@ const CreateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={objectChallenge.level}
+                    value={newChallenge.level}
                     onChange={(e) => {
-                      setObjectChallenge({
-                        ...objectChallenge,
+                      setNewChallenge({
+                        ...newChallenge,
                         level: e.target.value,
                       });
                     }}
@@ -354,7 +361,7 @@ const CreateChallenge = () => {
               </div>
 
               <button
-                onClick={() => setChallenge()}
+                onClick={() => createChallengeToBdd()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
                 Create challenge

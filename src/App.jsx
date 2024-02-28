@@ -5,13 +5,14 @@ import {
   Navigate,
 } from "react-router-dom";
 import { auth } from "../firebase";
+import { useEffect, useState } from "react";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
-import TablesChallenges from "./pages/TablesChallenges";
-import TablesUser from "./pages/TablesUser";
-import TablesEvent from "./pages/TablesEvent";
-import TablesStore from "./pages/TableStore";
+import TablesChallenges from "./pages/Challenges";
+import TablesUser from "./pages/Users";
+import TablesEvent from "./pages/Events";
+import TablesStore from "./pages/Store";
 import Calendar from "./pages/Calendar";
 import UpdateChallenge from "./pages/UpdateChallenge";
 import CreateChallenge from "./pages/CreateChallenge";
@@ -22,10 +23,25 @@ import UpdateEvent from "./pages/UpdateEvent";
 import UpdateUser from "./pages/UpdateUser";
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Afficher un indicateur de chargement pendant que Firebase vérifie l'état de connexion
+  }
+
   //eslint-disable-next-line
   const PrivateRoute = ({ children }) => {
-    const isLogged = auth.currentUser;
-    return isLogged ? children : <Navigate to="/" />;
+    return user ? children : <Navigate to="/" />;
   };
 
   return (

@@ -8,18 +8,18 @@ import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/FirebaseContext";
 
 const CreateProduct = () => {
-  const [objectProduct, setObjectProduct] = useState({});
+  const [newProduct, setNewProduct] = useState({});
   const { store } = useFirebase();
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
-  const setProduct = () => {
-    if (objectProduct.title !== "") {
+  const createNewProductToBdd = () => {
+    if (newProduct.title && newProduct.description && newProduct.category && newProduct.price && newProduct.subcriberPrice && newProduct.score && newProduct.img && newProduct.link && newProduct.subscriberDiscountLink && newProduct.subscriberDiscountText) {
       update(ref(db, `/Store/${store.length}`), {
-        ...objectProduct,
-        link: objectProduct.link || "",
-        subscriberDiscountLink: objectProduct.subscriberDiscountLink || "",
-        subscriberDiscountText: objectProduct.subscriberDiscountText || "",
+        ...newProduct,
+        link: newProduct.link || "",
+        subscriberDiscountLink: newProduct.subscriberDiscountLink || "",
+        subscriberDiscountText: newProduct.subscriberDiscountText || "",
       });
       setShowAlert(true);
       setTimeout(() => {
@@ -55,10 +55,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectProduct.title}
+                    value={newProduct.title}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         title: e.target.value,
                       });
                     }}
@@ -75,10 +75,10 @@ const CreateProduct = () => {
                   </label>
                   <textarea
                     rows={6}
-                    value={objectProduct.description}
+                    value={newProduct.description}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         description: e.target.value,
                       });
                     }}
@@ -96,10 +96,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectProduct.link}
+                    value={newProduct.link}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         link: e.target.value,
                       });
                     }}
@@ -116,10 +116,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectProduct.subscriberDiscountLink}
+                    value={newProduct.subscriberDiscountLink}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         subscriberDiscountLink: e.target.value,
                       });
                     }}
@@ -136,10 +136,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectProduct.subscriberDiscountText}
+                    value={newProduct.subscriberDiscountText}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         subscriberDiscountText: e.target.value,
                       });
                     }}
@@ -157,10 +157,10 @@ const CreateProduct = () => {
                   <input
                     type="number"
                     step="0.01"
-                    defaultValue={objectProduct.price}
+                    defaultValue={newProduct.price}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         price: parseFloat(e.target.value),
                       });
                     }}
@@ -178,10 +178,10 @@ const CreateProduct = () => {
                   <input
                     type="number"
                     step="0.01"
-                    defaultValue={objectProduct.subcriberPrice}
+                    defaultValue={newProduct.subcriberPrice}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         subcriberPrice: parseFloat(e.target.value),
                       });
                     }}
@@ -197,10 +197,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="number"
-                    value={objectProduct.score}
+                    value={newProduct.score}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         score: parseInt(e.target.value, 10),
                       });
                     }}
@@ -217,10 +217,10 @@ const CreateProduct = () => {
                   </label>
                   <input
                     type="text"
-                    value={objectProduct.img}
+                    value={newProduct.img}
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         img: e.target.value,
                       });
                     }}
@@ -236,12 +236,12 @@ const CreateProduct = () => {
                 <div className="relative z-20 bg-transparent">
                   <select
                     onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
+                      setNewProduct({
+                        ...newProduct,
                         category: e.target.value,
                       });
                     }}
-                    value={objectProduct.category}
+                    value={newProduct.category}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary `}
                   >
                     <option
@@ -294,7 +294,7 @@ const CreateProduct = () => {
               </div>
 
               <button
-                onClick={() => setProduct()}
+                onClick={() => createNewProductToBdd()}
                 className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
               >
                 Create product

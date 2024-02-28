@@ -4,7 +4,7 @@ import { useFirebase } from "../context/FirebaseContext";
 import TableChallengeDetails from "../components/Tables/TablechallengeDetails";
 import { useParams } from "react-router-dom";
 
-const TablesChallenges = () => {
+const Challenges = () => {
   const { data } = useFirebase();
   let { category } = useParams();
 
@@ -18,4 +18,4 @@ const TablesChallenges = () => {
   );
 };
 
-export default TablesChallenges;
+export default Challenges;

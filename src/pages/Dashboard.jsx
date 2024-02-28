@@ -1,6 +1,6 @@
 import CardDataStats from "../components/Card/CardDataStats";
-import ChartThree from "../components/Chart/ChartThree";
-import TableOne from "../components/Tables/TableOne";
+import ChartThree from "../components/Chart/ChartCategory";
+import TableStatistics from "../components/Tables/TableStatistics";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import TableChallenge from "../components/Tables/TableChallenge";
@@ -153,7 +153,7 @@ const Dashboard = () => {
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartThree series={counts} />
         <div className="col-span-12 xl:col-span-8">
-          <TableOne
+          <TableStatistics
             numberUser={Object.values(users).length}
             numberChallenge={TotalData()}
             list={[
