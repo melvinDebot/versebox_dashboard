@@ -269,6 +269,24 @@ const CreateProduct = () => {
                     >
                       Books
                     </option>
+                    <option
+                      value="clothes"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Vetements
+                    </option>
+                    <option
+                      value="bag"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Sacs
+                    </option>
+                    <option
+                      value="various"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Divers
+                    </option>
                   </select>
 
                   <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
