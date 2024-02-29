@@ -2,7 +2,6 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import DefaultLayout from "../layout/DefaultLayout";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/FirebaseContext";
@@ -10,7 +9,7 @@ import { useFirebase } from "../context/FirebaseContext";
 const CreateEvent = () => {
   const [newEvent, setNewEvent] = useState({});
   const { events } = useFirebase();
-  const [showAlert, setShowAlert] = useState(false);
+
   const navigate = useNavigate();
 
   const createEventToBdd = () => {
@@ -21,7 +20,7 @@ const CreateEvent = () => {
         subscriberDiscountLink: newEvent.subscriberDiscountLink || "",
         subscriberDiscountText: newEvent.subscriberDiscountText || "",
       });
-      setShowAlert(true);
+      alert("Event created successfully!")
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
@@ -31,13 +30,7 @@ const CreateEvent = () => {
   };
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="Challenge updated successfully"
-          type="success"
-          description="The challenge has been updated successfully. You will be redirected to the dashboard."
-        />
-      )}
+
       <Breadcrumb pageName="Create event" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
