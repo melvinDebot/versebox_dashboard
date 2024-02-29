@@ -2,7 +2,6 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import DefaultLayout from "../layout/DefaultLayout";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/FirebaseContext";
@@ -10,7 +9,6 @@ import { useFirebase } from "../context/FirebaseContext";
 const CreateProduct = () => {
   const [newProduct, setNewProduct] = useState({});
   const { store } = useFirebase();
-  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const createNewProductToBdd = () => {
@@ -21,7 +19,7 @@ const CreateProduct = () => {
         subscriberDiscountLink: newProduct.subscriberDiscountLink || "",
         subscriberDiscountText: newProduct.subscriberDiscountText || "",
       });
-      setShowAlert(true);
+      alert("Product added successfully");
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
@@ -32,13 +30,6 @@ const CreateProduct = () => {
 
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="Add product success!"
-          type="success"
-          description="You have successfully added a new product. You will be redirected to the dashboard."
-        />
-      )}
       <Breadcrumb pageName="Create Product" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">

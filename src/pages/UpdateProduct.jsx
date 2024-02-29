@@ -2,14 +2,12 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import DefaultLayout from "../layout/DefaultLayout";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 const UpdateProduct = () => {
   let { id } = useParams();
   const location = useLocation();
-  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const [objectProduct, setObjectProduct] = useState(location.state);
@@ -19,7 +17,7 @@ const UpdateProduct = () => {
       update(ref(db, `/Store/${id}`), {
         ...objectProduct,
       });
-      setShowAlert(true);
+      alert("Product updated");
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
@@ -30,13 +28,6 @@ const UpdateProduct = () => {
 
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="Add product success!"
-          type="success"
-          description="You have successfully added a new product. You will be redirected to the dashboard."
-        />
-      )}
       <Breadcrumb pageName="Update Product" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
@@ -266,6 +257,24 @@ const UpdateProduct = () => {
                       className="text-body dark:text-bodydark"
                     >
                       Books
+                    </option>
+                    <option
+                      value="clothes"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Vetements
+                    </option>
+                    <option
+                      value="bag"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Sacs
+                    </option>
+                    <option
+                      value="various"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Divers
                     </option>
                   </select>
 
