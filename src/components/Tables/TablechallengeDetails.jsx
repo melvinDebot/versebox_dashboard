@@ -10,8 +10,8 @@ const TableChallengeDetails = ({ list }) => {
 
   // Filtrer les éléments en fonction du terme de recherche
   const filteredList = list.filter((item) =>
-    item.verse.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+    item && item.verse && item.verse.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   // Calculer l'index de début et de fin pour la pagination
   const indexOfLastItem = currentPage * itemsPerPage;
