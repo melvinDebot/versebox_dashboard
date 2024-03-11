@@ -4,9 +4,10 @@ import TableStatistics from "../components/Tables/TableStatistics";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import TableChallenge from "../components/Tables/TableChallenge";
+import Swicht from "../components/Swicht/Swicht";
 
 const Dashboard = () => {
-  const { data, users, events, store } = useFirebase();
+  const { data, users, events, store, isActivated } = useFirebase();
 
   const TotalData = () => {
     let number = 0;
@@ -149,6 +150,17 @@ const Dashboard = () => {
           </svg>
         </CardDataStats>
       </div>
+
+      <div className="rounded-sm border border-stroke bg-white shadow-default my-3">
+            <div className="border-b border-stroke py-4 px-6.5">
+              <h3 className="font-medium text-black">
+                Active card game
+              </h3>
+            </div>
+            <div className="flex flex-col gap-5.5 p-6.5">
+              <Swicht enabled={isActivated} />
+            </div>
+          </div>
 
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartThree series={counts} />

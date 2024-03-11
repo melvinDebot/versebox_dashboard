@@ -14,6 +14,7 @@ export function FirebaseProvider({ children }) {
   const [store, setStore] = useState([]);
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [isActivated, setIsActivated] = useState(false);
 
   useEffect(() => {
     // Fonction pour récupérer les données de la base de données Firebase
@@ -28,6 +29,12 @@ export function FirebaseProvider({ children }) {
       onValue(EventRef, (snapshot) => {
         const data = snapshot.val();
         setEvents(data);
+      });
+
+      const isGameRef = ref(db, `isActiveGame/`);
+      onValue(isGameRef, (snapshot) => {
+        const data = snapshot.val();
+        setIsActivated(data);
       });
 
       const DatatRef = ref(db, `dataIHM/`);
@@ -51,6 +58,7 @@ export function FirebaseProvider({ children }) {
     store,
     data,
     users,
+    isActivated
   };
 
   return (
