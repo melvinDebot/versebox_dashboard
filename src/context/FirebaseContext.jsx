@@ -34,7 +34,7 @@ export function FirebaseProvider({ children }) {
       const isGameRef = ref(db, `isActiveGame/`);
       onValue(isGameRef, (snapshot) => {
         const data = snapshot.val();
-        setIsActivated(data);
+        setIsActivated(data.isActivated);
       });
 
       const DatatRef = ref(db, `dataIHM/`);

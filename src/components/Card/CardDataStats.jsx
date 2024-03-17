@@ -67,7 +67,7 @@ export default CardDataStats;
 
 CardDataStats.propTypes = {
   title: PropTypes.string.isRequired,
-  total: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
   rate: PropTypes.string.isRequired,
   levelUp: PropTypes.bool,
   levelDown: PropTypes.bool,

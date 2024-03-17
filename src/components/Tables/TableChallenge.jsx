@@ -72,5 +72,5 @@ const TableChallenge = ({ list }) => {
 export default TableChallenge;
 
 TableChallenge.propTypes = {
-  list: PropTypes.object,
+  list: PropTypes.array,
 };

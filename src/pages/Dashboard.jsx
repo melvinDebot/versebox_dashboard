@@ -5,6 +5,8 @@ import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import TableChallenge from "../components/Tables/TableChallenge";
 import Swicht from "../components/Swicht/Swicht";
+import { db } from "../../firebase";
+import { ref, update } from "firebase/database";
 
 const Dashboard = () => {
   const { data, users, events, store, isActivated } = useFirebase();
@@ -41,6 +43,13 @@ const Dashboard = () => {
   }
 
   const counts = countUsersByCategory(users);
+
+  const activeGameCard = () => {
+    const gameCardRef = ref(db, "isActiveGame");
+    update(gameCardRef, {
+      isActivated: !isActivated,
+    });
+  }
 
   return (
     <DefaultLayout>
@@ -158,7 +167,7 @@ const Dashboard = () => {
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
-              <Swicht enabled={isActivated} />
+              <Swicht enabled={isActivated} handleChange={()=> activeGameCard()} />
             </div>
           </div>
 
