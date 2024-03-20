@@ -4,17 +4,16 @@ import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 
 const UpdateChallenge = () => {
   const navigate = useNavigate();
   let { id } = useParams();
   const location = useLocation();
   const [updatedChallengeData, setUpdatedChallengeData] = useState(location.state);
-  const [showAlert, setShowAlert] = useState(false);
 
   const updatedChallengeToBdd = () => {
     if (location.state.categories[0] != undefined) {
+      
       update(ref(db, `/dataIHM/${location.state.categories[0]}/${id}/`), {
         ...updatedChallengeData,
         categories:
@@ -24,10 +23,10 @@ const UpdateChallenge = () => {
         like: 0,
         unlike: 0,
       });
-      setShowAlert(true);
+      alert("Challenge updated successfully");
       setTimeout(() => {
         navigate(`/dashboard`);
-      }, 3000);
+      }, 1000);
     } else {
       alert("Veuillez ajouter une categorie");
     }
@@ -35,14 +34,6 @@ const UpdateChallenge = () => {
 
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="Challenge updated successfully"
-          type="success"
-          description="Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry."
-        />
-      )}
       <Breadcrumb
         pageName={`challenge ${id} ${location.state.categories[0]}`}
       />
@@ -60,7 +51,7 @@ const UpdateChallenge = () => {
                     Verset <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    value={location.state.verse}
+                    defaultValue={location.state.verse}
                     type="text"
                     placeholder="Mathieu 2:11"
                     onChange={(e) => {
@@ -79,7 +70,7 @@ const UpdateChallenge = () => {
                 </label>
                 <textarea
                   rows={6}
-                  value={location.state.verseText}
+                  defaultValue={location.state.verseText}
                   placeholder="Type your content"
                   onChange={(e) => {
                     setUpdatedChallengeData({
@@ -102,7 +93,7 @@ const UpdateChallenge = () => {
                       verseDescription: e.target.value,
                     });
                   }}
-                  value={location.state.verseDescription}
+                  defaultValue={location.state.verseDescription}
                   placeholder="Type your explication"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -119,7 +110,7 @@ const UpdateChallenge = () => {
                       challenge: e.target.value,
                     });
                   }}
-                  value={location.state.challenge}
+                  defaultValue={location.state.challenge}
                   placeholder="Type your challenge"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                 ></textarea>
@@ -130,7 +121,7 @@ const UpdateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={location.state.categories[0]}
+                    defaultValue={location.state.categories[0]}
                     onChange={(e) => {
                       setUpdatedChallengeData({
                         ...updatedChallengeData,
@@ -229,7 +220,7 @@ const UpdateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={location.state.point ? location.state.point : ""}
+                    defaultValue={location.state.point ? location.state.point : ""}
                     onChange={(e) => {
                       setUpdatedChallengeData({
                         ...updatedChallengeData,
@@ -292,7 +283,7 @@ const UpdateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    value={location.state.level ? location.state.level : ""}
+                    defaultValue={updatedChallengeData?.state?.level ? updatedChallengeData?.state?.level : ""}
                     onChange={(e) => {
                       setUpdatedChallengeData({
                         ...updatedChallengeData,
