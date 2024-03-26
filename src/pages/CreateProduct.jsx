@@ -12,7 +12,18 @@ const CreateProduct = () => {
   const navigate = useNavigate();
 
   const createNewProductToBdd = () => {
-    if (newProduct.title && newProduct.description && newProduct.category && newProduct.price && newProduct.subcriberPrice && newProduct.score && newProduct.img && newProduct.link && newProduct.subscriberDiscountLink && newProduct.subscriberDiscountText) {
+    if (
+      newProduct.title &&
+      newProduct.description &&
+      newProduct.category &&
+      newProduct.price &&
+      newProduct.subcriberPrice &&
+      newProduct.score &&
+      newProduct.img &&
+      newProduct.link &&
+      newProduct.subscriberDiscountLink &&
+      newProduct.subscriberDiscountText
+    ) {
       update(ref(db, `/Store/${store.length}`), {
         ...newProduct,
         link: newProduct.link || "",

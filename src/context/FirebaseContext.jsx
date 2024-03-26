@@ -58,7 +58,7 @@ export function FirebaseProvider({ children }) {
     store,
     data,
     users,
-    isActivated
+    isActivated,
   };
 
   return (

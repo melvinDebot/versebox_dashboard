@@ -60,10 +60,13 @@ const TableEvent = ({ list }) => {
           <div className="col-span-2 flex items-center">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className=" rounded-md">
-                <img src={event.img} alt="Product" className="object-cover w-28" />
+                <img
+                  src={event.img}
+                  alt="Product"
+                  className="object-cover w-28"
+                />
                 <p className="text-sm text-black ">{event.title}</p>
               </div>
-              
             </div>
           </div>
           <div className="col-span-1 hidden items-center sm:flex">
@@ -120,4 +123,4 @@ export default TableEvent;
 
 TableEvent.propTypes = {
   list: PropTypes.array,
-}
+};

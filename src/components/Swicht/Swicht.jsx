@@ -1,8 +1,6 @@
 import { PropTypes } from "prop-types";
 
-
-
-const Switch = ({enabled, handleChange}) => {
+const Switch = ({ enabled, handleChange }) => {
   return (
     <div>
       <label
@@ -19,10 +17,10 @@ const Switch = ({enabled, handleChange}) => {
           <div className="block h-8 w-14 rounded-full bg-meta-9"></div>
           <div
             className={`dot absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition ${
-              enabled && '!right-1 !translate-x-full !bg-primary'
+              enabled && "!right-1 !translate-x-full !bg-primary"
             }`}
           >
-            <span className={`hidden ${enabled && '!block'}`}>
+            <span className={`hidden ${enabled && "!block"}`}>
               <svg
                 className="fill-white"
                 width="11"
@@ -39,7 +37,7 @@ const Switch = ({enabled, handleChange}) => {
                 ></path>
               </svg>
             </span>
-            <span className={`${enabled && 'hidden'}`}>
+            <span className={`${enabled && "hidden"}`}>
               <svg
                 className="h-4 w-4 stroke-current"
                 fill="none"
@@ -64,8 +62,6 @@ const Switch = ({enabled, handleChange}) => {
 Switch.propTypes = {
   enabled: PropTypes.bool,
   handleChange: PropTypes.func,
-}
-
-
+};
 
 export default Switch;

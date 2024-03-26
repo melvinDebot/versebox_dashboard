@@ -37,7 +37,6 @@ const SignIn = () => {
     } else {
       alert("Email non autorisé");
     }
-      
   };
 
   return (

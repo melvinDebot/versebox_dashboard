@@ -13,14 +13,21 @@ const CreateEvent = () => {
   const navigate = useNavigate();
 
   const createEventToBdd = () => {
-    if (newEvent.title && newEvent.description && newEvent.location && newEvent.startDate && newEvent.endDate && newEvent.img) {
+    if (
+      newEvent.title &&
+      newEvent.description &&
+      newEvent.location &&
+      newEvent.startDate &&
+      newEvent.endDate &&
+      newEvent.img
+    ) {
       update(ref(db, `/Events/${events.length}`), {
         ...newEvent,
         link: newEvent.link || "",
         subscriberDiscountLink: newEvent.subscriberDiscountLink || "",
         subscriberDiscountText: newEvent.subscriberDiscountText || "",
       });
-      alert("Event created successfully!")
+      alert("Event created successfully!");
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
@@ -30,7 +37,6 @@ const CreateEvent = () => {
   };
   return (
     <DefaultLayout>
-
       <Breadcrumb pageName="Create event" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">

@@ -9,11 +9,12 @@ const UpdateChallenge = () => {
   const navigate = useNavigate();
   let { id } = useParams();
   const location = useLocation();
-  const [updatedChallengeData, setUpdatedChallengeData] = useState(location.state);
+  const [updatedChallengeData, setUpdatedChallengeData] = useState(
+    location.state,
+  );
 
   const updatedChallengeToBdd = () => {
     if (location.state.categories[0] != undefined) {
-      
       update(ref(db, `/dataIHM/${location.state.categories[0]}/${id}/`), {
         ...updatedChallengeData,
         categories:
@@ -220,7 +221,9 @@ const UpdateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    defaultValue={location.state.point ? location.state.point : ""}
+                    defaultValue={
+                      location.state.point ? location.state.point : ""
+                    }
                     onChange={(e) => {
                       setUpdatedChallengeData({
                         ...updatedChallengeData,
@@ -283,7 +286,11 @@ const UpdateChallenge = () => {
 
                 <div className="relative z-20 bg-transparent">
                   <select
-                    defaultValue={updatedChallengeData?.state?.level ? updatedChallengeData?.state?.level : ""}
+                    defaultValue={
+                      updatedChallengeData?.state?.level
+                        ? updatedChallengeData?.state?.level
+                        : ""
+                    }
                     onChange={(e) => {
                       setUpdatedChallengeData({
                         ...updatedChallengeData,

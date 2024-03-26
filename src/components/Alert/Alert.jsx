@@ -1,8 +1,6 @@
 import { PropTypes } from "prop-types";
 
 const Alert = ({ message, type, description, show }) => {
-
-
   return (
     <>
       {type === "success" && (

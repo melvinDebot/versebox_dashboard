@@ -14,14 +14,16 @@ const CreateChallenge = () => {
   const [showAlert, setShowAlert] = useState(false);
 
   const createChallengeToBdd = () => {
-    if (newChallenge.verse &&
-    newChallenge.verseText &&
-    newChallenge.verseDescription &&
-    newChallenge.challenge &&
+    if (
+      newChallenge.verse &&
+      newChallenge.verseText &&
+      newChallenge.verseDescription &&
+      newChallenge.challenge &&
       newChallenge.point &&
-    newChallenge.level &&
-    newChallenge.categories &&
-    newChallenge.categories.length > 0) {
+      newChallenge.level &&
+      newChallenge.categories &&
+      newChallenge.categories.length > 0
+    ) {
       update(
         ref(
           db,
@@ -209,6 +211,12 @@ const CreateChallenge = () => {
                       className="text-body dark:text-bodydark"
                     >
                       Spiritualité
+                    </option>
+                    <option
+                      value="professionnel"
+                      className="text-body dark:text-bodydark"
+                    >
+                      Professinnel
                     </option>
                   </select>
 
