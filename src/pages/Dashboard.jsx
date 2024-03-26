@@ -193,12 +193,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        
-      </div>
+      <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5"></div>
 
       <div className="rounded-sm border border-stroke bg-white p-5 pt-6 pb-2.5 shadow-default sm:px-7.5 xl:pb-1">
-        <h4 className="mb-6 text-xl font-semibold text-black ">Code Prome</h4>
+        <h4 className="mb-6 text-xl font-semibold text-black ">Code Promo</h4>
 
         <div className="flex flex-col">
           <div className="grid grid-cols-3 rounded-sm bg-gray-2  sm:grid-cols-5">
@@ -247,7 +245,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
     </DefaultLayout>
   );
 };
