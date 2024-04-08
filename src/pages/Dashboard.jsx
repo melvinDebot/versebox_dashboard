@@ -9,7 +9,15 @@ import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 
 const Dashboard = () => {
-  const { data, users, events, store, isActivated } = useFirebase();
+  const {
+    data,
+    users,
+    events,
+    store,
+    isActivated,
+    isActivatedEvent,
+    isActivatedStore,
+  } = useFirebase();
 
   const TotalData = () => {
     let number = 0;
@@ -48,6 +56,20 @@ const Dashboard = () => {
     const gameCardRef = ref(db, "isActiveGame");
     update(gameCardRef, {
       isActivated: !isActivated,
+    });
+  };
+
+  const toggleEventCard = () => {
+    const eventCardRef = ref(db, "isActiveGame");
+    update(eventCardRef, {
+      isActiveEvent: !isActivatedEvent,
+    });
+  };
+
+  const toggleStoreCard = () => {
+    const storeCardRef = ref(db, "isActiveGame/isActiveStore");
+    update(storeCardRef, {
+      isActiveStore: !isActivatedStore,
     });
   };
 
@@ -161,11 +183,27 @@ const Dashboard = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default my-3">
         <div className="border-b border-stroke py-4 px-6.5">
-          <h3 className="font-medium text-black">Active card game</h3>
+          <h3 className="font-medium text-black">Toggle</h3>
         </div>
         <div className="flex flex-col gap-5.5 p-6.5">
+          Active Game
           <Swicht enabled={isActivated} handleChange={() => activeGameCard()} />
+          Active Event
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 "
+            onClick={() => toggleEventCard()}
+          >
+            {isActivatedEvent ? "Event active" : "event is not active"}
+          </button>
+          Store Event
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 "
+            onClick={() => toggleEventCard()}
+          >
+            {isActivatedEvent ? "Event active" : "event is not active"}
+          </button>
         </div>
+        <div className="flex flex-col gap-5.5 p-6.5"></div>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">

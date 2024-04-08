@@ -15,6 +15,8 @@ export function FirebaseProvider({ children }) {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [isActivated, setIsActivated] = useState(false);
+  const [isActivatedEvent, setIsActivatedEvent] = useState(false);
+  const [isActivatedStore, setIsActivatedStore] = useState(false);
 
   useEffect(() => {
     // Fonction pour récupérer les données de la base de données Firebase
@@ -31,10 +33,12 @@ export function FirebaseProvider({ children }) {
         setEvents(data);
       });
 
-      const isGameRef = ref(db, `isActiveGame/`);
-      onValue(isGameRef, (snapshot) => {
+      const getItemsActiveNavBar = ref(db, `isActiveGame/`);
+      onValue(getItemsActiveNavBar, (snapshot) => {
         const data = snapshot.val();
         setIsActivated(data.isActivated);
+        setIsActivatedEvent(data.isActivateEvent);
+        setIsActivatedStore(data.isActiveStore);
       });
 
       const DatatRef = ref(db, `dataIHM/`);
@@ -59,6 +63,8 @@ export function FirebaseProvider({ children }) {
     data,
     users,
     isActivated,
+    isActivatedEvent,
+    isActivatedStore,
   };
 
   return (
