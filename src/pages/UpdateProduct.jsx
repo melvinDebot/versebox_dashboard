@@ -5,6 +5,8 @@ import { ref, update } from "firebase/database";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
+import ChartLine from "../components/Chart/ChartLine";
+
 const UpdateProduct = () => {
   let { id } = useParams();
   const location = useLocation();
@@ -26,9 +28,32 @@ const UpdateProduct = () => {
     }
   };
 
+  const extractDataFromEventClicksByDay = (productObject) => {
+    if (productObject && productObject.clicksByDay) {
+      // Vérifie si clicksByDay est un objet et non null
+      return Object.keys(productObject.clicksByDay).map(
+        (day) => productObject.clicksByDay[day].data,
+      );
+    } else {
+      console.error(
+        "clicksByDay is not defined or is not an object:",
+        productObject,
+      );
+      return []; // Retourne un tableau vide si clicksByDay n'est pas un objet
+    }
+  };
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Update Product" />
+      <ChartLine
+        series={[
+          {
+            name: objectProduct.title,
+            data: extractDataFromEventClicksByDay(objectProduct),
+          },
+        ]}
+      />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}

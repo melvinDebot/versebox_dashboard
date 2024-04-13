@@ -4,20 +4,11 @@ import TableStatistics from "../components/Tables/TableStatistics";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import TableChallenge from "../components/Tables/TableChallenge";
-import Swicht from "../components/Swicht/Swicht";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 
 const Dashboard = () => {
-  const {
-    data,
-    users,
-    events,
-    store,
-    isActivated,
-    isActivatedEvent,
-    isActivatedStore,
-  } = useFirebase();
+  const { data, users, events, store, dataNavBar } = useFirebase();
 
   const TotalData = () => {
     let number = 0;
@@ -52,25 +43,19 @@ const Dashboard = () => {
 
   const counts = countUsersByCategory(users);
 
-  const activeGameCard = () => {
-    const gameCardRef = ref(db, "isActiveGame");
-    update(gameCardRef, {
-      isActivated: !isActivated,
-    });
-  };
-
   const toggleEventCard = () => {
     const eventCardRef = ref(db, "isActiveGame");
-    update(eventCardRef, {
-      isActiveEvent: !isActivatedEvent,
-    });
+    update(eventCardRef, { isActiveEvent: !dataNavBar.isActiveEvent });
   };
 
   const toggleStoreCard = () => {
-    const storeCardRef = ref(db, "isActiveGame/isActiveStore");
-    update(storeCardRef, {
-      isActiveStore: !isActivatedStore,
-    });
+    const storeCardRef = ref(db, "isActiveGame");
+    update(storeCardRef, { isActiveStore: !dataNavBar.isActiveStore });
+  };
+
+  const activeGameCard = () => {
+    const gameCardRef = ref(db, "isActiveGame");
+    update(gameCardRef, { isActivated: !dataNavBar.isActivated });
   };
 
   return (
@@ -183,27 +168,79 @@ const Dashboard = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default my-3">
         <div className="border-b border-stroke py-4 px-6.5">
-          <h3 className="font-medium text-black">Toggle</h3>
+          <h3 className="font-medium text-black">Game in the app</h3>
         </div>
-        <div className="flex flex-col gap-5.5 p-6.5">
-          Active Game
-          <Swicht enabled={isActivated} handleChange={() => activeGameCard()} />
-          Active Event
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 "
-            onClick={() => toggleEventCard()}
-          >
-            {isActivatedEvent ? "Event active" : "event is not active"}
-          </button>
-          Store Event
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 "
-            onClick={() => toggleEventCard()}
-          >
-            {isActivatedEvent ? "Event active" : "event is not active"}
-          </button>
+        <div className="flex flex-row flex-wrap gap-5.5 p-6.5 justify-between">
+          <div className="flex flex-col items-center">
+            <label className="inline-flex items-center me-5 cursor-pointer">
+              <input
+                type="checkbox"
+                value={dataNavBar.isActivated}
+                className="sr-only peer"
+                checked={dataNavBar.isActivated}
+                onChange={() => activeGameCard()}
+              />
+              <div
+                style={{ backgroundColor: "grey" }}
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+              ></div>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                {dataNavBar.isActivated
+                  ? "Game is active"
+                  : "Game is desactive"}
+              </span>
+            </label>
+          </div>
         </div>
-        <div className="flex flex-col gap-5.5 p-6.5"></div>
+      </div>
+
+      <div className="rounded-sm border border-stroke bg-white shadow-default my-3">
+        <div className="border-b border-stroke py-4 px-6.5">
+          <h3 className="font-medium text-black">Toggle Navbar</h3>
+        </div>
+        <div className="flex flex-row flex-wrap gap-5.5 p-6.5 justify-between">
+          <div className="flex flex-col items-center">
+            <label className="inline-flex items-center me-5 cursor-pointer">
+              <input
+                type="checkbox"
+                value={dataNavBar.isActiveEvent}
+                className="sr-only peer"
+                checked={dataNavBar.isActiveEvent}
+                onChange={() => toggleEventCard()}
+              />
+              <div
+                style={{ backgroundColor: "grey" }}
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+              ></div>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                {dataNavBar.isActiveEvent
+                  ? "Event is active"
+                  : "Event is desactive"}
+              </span>
+            </label>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <label className="inline-flex items-center me-5 cursor-pointer">
+              <input
+                type="checkbox"
+                value={dataNavBar.isActiveStore}
+                className="sr-only peer"
+                checked={dataNavBar.isActiveStore}
+                onChange={() => toggleStoreCard()}
+              />
+              <div
+                style={{ backgroundColor: "grey" }}
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+              ></div>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                {dataNavBar.isActiveStore
+                  ? "store is active"
+                  : "store is desactive"}
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">

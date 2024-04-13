@@ -6,6 +6,8 @@ import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
+import ChartLine from "../components/Chart/ChartLine";
+
 const UpdateEvent = () => {
   let { id } = useParams();
   const location = useLocation();
@@ -28,6 +30,21 @@ const UpdateEvent = () => {
     }
   };
 
+  const extractDataFromEventClicksByDay = (eventObject) => {
+    if (eventObject && eventObject.clicksByDay) {
+      // Vérifie si clicksByDay est un objet et non null
+      return Object.keys(eventObject.clicksByDay).map(
+        (day) => eventObject.clicksByDay[day].data,
+      );
+    } else {
+      console.error(
+        "clicksByDay is not defined or is not an object:",
+        eventObject,
+      );
+      return []; // Retourne un tableau vide si clicksByDay n'est pas un objet
+    }
+  };
+
   return (
     <DefaultLayout>
       {showAlert && (
@@ -39,7 +56,15 @@ const UpdateEvent = () => {
         />
       )}
       <Breadcrumb pageName="Create event" />
-      <div className="grid grid-cols-1 gap-9">
+      <ChartLine
+        series={[
+          {
+            name: objectEvent.title,
+            data: extractDataFromEventClicksByDay(objectEvent),
+          },
+        ]}
+      />
+      <div className="grid grid-cols-1 gap-9 mt-9">
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default">
