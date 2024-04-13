@@ -55,7 +55,7 @@ const UpdateEvent = () => {
             industry."
         />
       )}
-      <Breadcrumb pageName="Create event" />
+      <Breadcrumb pageName="UPDATE EVENT" />
       <ChartLine
         series={[
           {

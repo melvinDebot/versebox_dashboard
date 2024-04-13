@@ -36,7 +36,7 @@ const UpdateChallenge = () => {
   return (
     <DefaultLayout>
       <Breadcrumb
-        pageName={`challenge ${id} ${location.state.categories[0]}`}
+        pageName={`UPDATE :challenge ${id} ${location.state.categories[0]}`}
       />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">

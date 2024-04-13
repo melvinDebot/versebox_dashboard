@@ -37,7 +37,7 @@ const UpdateUser = () => {
           description="You will be redirected to the dashboard."
         />
       )}
-      <Breadcrumb pageName="update user" />
+      <Breadcrumb pageName="UPDATE USER" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           <div className="rounded-sm border border-stroke bg-white shadow-default">

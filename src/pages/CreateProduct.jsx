@@ -29,6 +29,16 @@ const CreateProduct = () => {
         link: newProduct.link || "",
         subscriberDiscountLink: newProduct.subscriberDiscountLink || "",
         subscriberDiscountText: newProduct.subscriberDiscountText || "",
+        clicksByDay: {
+          Lun: { data: 0 },
+          Mar: { data: 0 },
+          Mer: { data: 0 },
+          Jeu: { data: 0 },
+          Ven: { data: 0 },
+          Sam: { data: 0 },
+          Dim: { data: 0 },
+        },
+        clicks: 0,
       });
       alert("Product added successfully");
       setTimeout(() => {
