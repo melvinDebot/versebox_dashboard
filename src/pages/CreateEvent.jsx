@@ -36,6 +36,7 @@ const CreateEvent = () => {
           Dim: { data: 0 },
         },
         clicks: 0,
+        id: events.length
       });
       alert("Event created successfully!");
       setTimeout(() => {
