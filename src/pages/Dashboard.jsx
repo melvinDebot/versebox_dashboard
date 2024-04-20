@@ -1,5 +1,7 @@
 import CardDataStats from "../components/Card/CardDataStats";
 import ChartThree from "../components/Chart/ChartCategory";
+import ChartGender from "../components/Chart/ChartGender";
+import ChartAge from "../components/Chart/ChartAge";
 import TableStatistics from "../components/Tables/TableStatistics";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
@@ -39,6 +41,70 @@ const Dashboard = () => {
     const countsArray = Object.values(categoriesCount);
 
     return countsArray;
+  }
+
+  function countGenders(usersArray) {
+    let maleCount = 0;
+    let femaleCount = 0;
+
+    // Parcourir chaque objet dans le tableau
+    usersArray.forEach((userObject) => {
+      // Accéder à l'objet utilisateur et vérifier le champ 'gender'
+      if (userObject.user.gender === "man") {
+        maleCount++; // Incrémenter le compteur pour les hommes
+      } else if (userObject.user.gender === "woman") {
+        femaleCount++; // Incrémenter le compteur pour les femmes
+      }
+    });
+
+    // Retourner un tableau avec les deux compteurs
+    return [maleCount, femaleCount];
+  }
+
+  function calculateAgeRanges(usersArray) {
+    // Définir les tranches d'âge
+    const ageRanges = {
+      "18-29": [],
+      "30-44": [],
+      "45-59": [],
+      "60+": [],
+    };
+
+    // Obtenir l'année actuelle
+    const currentYear = new Date().getFullYear();
+
+    // Parcourir chaque utilisateur pour classer son âge
+    usersArray.forEach((userObject) => {
+      const birthDate = userObject.user.age;
+      if (birthDate) {
+        // Vérifier que la date de naissance est définie
+        const birthYear = parseInt(birthDate.substring(0, 4));
+        const age = currentYear - birthYear; // Calcul de l'âge
+
+        // Classer par tranche d'âge
+        if (age >= 18 && age <= 29) {
+          ageRanges["18-29"].push(age);
+        } else if (age >= 30 && age <= 44) {
+          ageRanges["30-44"].push(age);
+        } else if (age >= 45 && age <= 59) {
+          ageRanges["45-59"].push(age);
+        } else if (age >= 60) {
+          ageRanges["60+"].push(age);
+        }
+      }
+    });
+
+    // Calculer la moyenne pour chaque tranche ou retourner null si vide
+    const averages = Object.keys(ageRanges).map((range) => {
+      const ages = ageRanges[range];
+      if (ages.length === 0) return 0; // Retourner null si aucune donnée n'est présente dans la tranche
+      return Math.round(
+        ages.reduce((sum, current) => sum + current, 0) / ages.length,
+      );
+    });
+
+    // Créer le tableau d'objet pour le résultat final
+    return [{ name: "âge", data: averages }];
   }
 
   const counts = countUsersByCategory(users);
@@ -182,9 +248,9 @@ const Dashboard = () => {
               />
               <div
                 style={{ backgroundColor: "grey" }}
-                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <span className="ms-3 text-sm font-medium text-gray-900">
                 {dataNavBar.isActivated
                   ? "Game is active"
                   : "Game is desactive"}
@@ -210,9 +276,9 @@ const Dashboard = () => {
               />
               <div
                 style={{ backgroundColor: "grey" }}
-                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <span className="ms-3 text-sm font-medium text-gray-900">
                 {dataNavBar.isActiveEvent
                   ? "Event is active"
                   : "Event is desactive"}
@@ -231,9 +297,9 @@ const Dashboard = () => {
               />
               <div
                 style={{ backgroundColor: "grey" }}
-                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"
+                className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <span className="ms-3 text-sm font-medium text-gray-900">
                 {dataNavBar.isActiveStore
                   ? "store is active"
                   : "store is desactive"}
@@ -245,6 +311,8 @@ const Dashboard = () => {
 
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartThree series={counts} />
+        <ChartGender series={countGenders(Object.values(users))} />
+        <ChartAge series={calculateAgeRanges(Object.values(users))} />
         <div className="col-span-12 xl:col-span-8">
           <TableStatistics
             numberUser={Object.values(users).length}

@@ -27,16 +27,16 @@ const CreateEvent = () => {
         subscriberDiscountLink: newEvent.subscriberDiscountLink || "",
         subscriberDiscountText: newEvent.subscriberDiscountText || "",
         clicksByDay: [
-      { day: "Dim", data: 0 },
-      { day: "Lun", data: 0 },
-      { day: "Mar", data: 0 },
-      { day: "Mer", data: 0 },
-      { day: "Jeu", data: 0 },
-      { day: "Ven", data: 0 },
-      { day: "Sam", data: 0 },
-    ],
+          { day: "Dim", data: 0 },
+          { day: "Lun", data: 0 },
+          { day: "Mar", data: 0 },
+          { day: "Mer", data: 0 },
+          { day: "Jeu", data: 0 },
+          { day: "Ven", data: 0 },
+          { day: "Sam", data: 0 },
+        ],
         clicks: 0,
-        id: events.length
+        id: events.length,
       });
       alert("Event created successfully!");
       setTimeout(() => {
