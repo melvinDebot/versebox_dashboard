@@ -40,9 +40,9 @@ const SignIn = () => {
   };
 
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default">
-      <div className="flex flex-wrap items-center">
-        <div className="hidden w-full xl:block xl:w-1/2">
+    <div className="rounded-sm border border-stroke bg-white shadow-default w-full h-full">
+      <div className="flex flex-wrap items-center w-full h-full">
+        <div className="hidden w-full h-full xl:block xl:w-1/2">
           <div className="py-17.5 px-26 text-center">
             <Link className="mb-5.5 inline-block" to="/">
               <img className="hidden dark:block" src={Logo} alt="Logo" />
@@ -265,7 +265,7 @@ const SignIn = () => {
           </div>
         </div>
       </div>
-      <p>Version 1.2.0</p>
+      <p className="text-center p-1">Version 1.3.0</p>
     </div>
   );
 };
