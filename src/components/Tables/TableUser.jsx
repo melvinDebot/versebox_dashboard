@@ -12,8 +12,8 @@ const TableUser = ({ list }) => {
   const filteredList = Object.values(list).filter(
     (item) =>
       item.user &&
-      item.user.uuidUser &&
-      item.user.uuidUser.toLowerCase().includes(searchTerm.toLowerCase()),
+      item.user.email &&
+      item.user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Calculer l'index de début et de fin pour la pagination
@@ -29,7 +29,7 @@ const TableUser = ({ list }) => {
       <div className="max-w-full overflow-x-auto">
         <input
           type="text"
-          placeholder="Rechercher un uuid..."
+          placeholder="Rechercher un email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
@@ -37,50 +37,66 @@ const TableUser = ({ list }) => {
         <table className="w-full table-auto">
           <thead>
             <tr className="bg-gray-2 text-left">
-              <th className="min-w-[220px] py-4 px-4 font-medium text-black  xl:pl-11">
-                Uuid
+              <th className="min-w-[150px] py-4 px-4 font-medium text-black ">
+                Email
               </th>
               <th className="min-w-[150px] py-4 px-4 font-medium text-black ">
                 name
               </th>
               <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
-                Actions
+                Streaks
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+                Points
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+                Subcription
+              </th>
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+                Edit
               </th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((item, key) => (
               <tr key={key}>
-                <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-                  <h5 className="font-medium text-black ">
-                    {item.user.uuidUser}
-                  </h5>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <p className="text-black ">{item.user.email}</p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <p className="text-black ">{item.user.nameUser}</p>
                 </td>
-                <td
-                  className="border-b border-[#eee] py-5 px-4 dark:border-strokedark"
-                  onClick={() =>
-                    navigate(`/update-user/${item.user.uuidUser}`, {
-                      state: item.user,
-                    })
-                  }
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
+                    {item.user.streaks || 0}
+                  </span>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                    {item.user.score || 0}
+                  </span>
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <input
+                    disabled
+                    type="checkbox"
+                    id="hs-basic-usage"
+                    checked={item.user.isCertified || false}
+                    className="relative w-[3.25rem] h-7 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-blue-600 checked:border-blue-600 focus:checked:border-blue-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-600 before:inline-block before:size-6 before:bg-white checked:before:bg-blue-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200"
+                  />
+                </td>
+                <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                  <button
+                    onClick={() =>
+                      navigate(`/update-user/${item.user.uuidUser}`, {
+                        state: item.user,
+                      })
+                    }
+                    type="button"
+                    className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                    />
-                  </svg>
+                    Edit
+                  </button>
                 </td>
               </tr>
             ))}
