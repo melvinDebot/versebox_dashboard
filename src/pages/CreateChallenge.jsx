@@ -216,7 +216,7 @@ const CreateChallenge = () => {
                       value="professionnel"
                       className="text-body dark:text-bodydark"
                     >
-                      Professinnel
+                      Professionnel
                     </option>
                   </select>
 

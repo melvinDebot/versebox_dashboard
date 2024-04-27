@@ -6,8 +6,8 @@ const options = {
     fontFamily: "Satoshi, sans-serif",
     type: "donut",
   },
-  colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF"],
-  labels: ["Motivation", "Mental", "Spiritualité", "Relationnel"],
+  colors: ["#049C0A", "#52B196"],
+  labels: ["Homme", "Femme"],
   legend: {
     show: false,
     position: "bottom",
@@ -63,7 +63,7 @@ const ChartGender = ({ series }) => {
       <div className="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#049C0A]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
               <span> Homme </span>
               <span> {series[0]}% </span>
@@ -72,7 +72,7 @@ const ChartGender = ({ series }) => {
         </div>
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#6577F3]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#52B196]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
               <span> Femme</span>
               <span> {series[1]}% </span>

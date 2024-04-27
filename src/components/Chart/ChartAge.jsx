@@ -2,7 +2,7 @@ import { PropTypes } from "prop-types";
 import ReactApexChart from "react-apexcharts";
 
 const options = {
-  colors: ["#3C50E0", "#80CAEE"],
+  colors: ["#EE630B"],
   chart: {
     fontFamily: "Satoshi, sans-serif",
     type: "bar",
