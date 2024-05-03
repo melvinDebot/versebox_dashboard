@@ -2,7 +2,6 @@ import CardDataStats from "../components/Card/CardDataStats";
 import ChartThree from "../components/Chart/ChartCategory";
 import ChartGender from "../components/Chart/ChartGender";
 import ChartAge from "../components/Chart/ChartAge";
-import TableStatistics from "../components/Tables/TableStatistics";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import TableChallenge from "../components/Tables/TableChallenge";
@@ -10,7 +9,8 @@ import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
 
 const Dashboard = () => {
-  const { data, users, events, store, dataNavBar } = useFirebase();
+  const { data, users, events, store, dataNavBar, getListCodes } =
+    useFirebase();
 
   const TotalData = () => {
     let number = 0;
@@ -243,7 +243,7 @@ const Dashboard = () => {
                 type="checkbox"
                 value={dataNavBar.isActivated}
                 className="sr-only peer"
-                checked={dataNavBar.isActivated}
+                checked={dataNavBar.isActivated || false}
                 onChange={() => activeGameCard()}
               />
               <div
@@ -271,7 +271,7 @@ const Dashboard = () => {
                 type="checkbox"
                 value={dataNavBar.isActiveEvent}
                 className="sr-only peer"
-                checked={dataNavBar.isActiveEvent}
+                checked={dataNavBar.isActiveEvent || false}
                 onChange={() => toggleEventCard()}
               />
               <div
@@ -292,7 +292,7 @@ const Dashboard = () => {
                 type="checkbox"
                 value={dataNavBar.isActiveStore}
                 className="sr-only peer"
-                checked={dataNavBar.isActiveStore}
+                checked={dataNavBar.isActiveStore || false}
                 onChange={() => toggleStoreCard()}
               />
               <div
@@ -314,24 +314,6 @@ const Dashboard = () => {
         <ChartGender series={countGenders(Object.values(users))} />
         <ChartAge series={calculateAgeRanges(Object.values(users))} />
         <div className="col-span-12 xl:col-span-8">
-          <TableStatistics
-            numberUser={Object.values(users).length}
-            numberChallenge={TotalData()}
-            list={[
-              {
-                title: "Challenge",
-                currentData: TotalData(),
-                goalData: "3600",
-              },
-              {
-                name: "Users",
-                visitors: Object.values(users).length,
-                revenues: "300",
-              },
-            ]}
-          />
-        </div>
-        <div className="col-span-12 xl:col-span-8">
           <TableChallenge list={data} />
         </div>
       </div>
@@ -340,52 +322,81 @@ const Dashboard = () => {
 
       <div className="rounded-sm border border-stroke bg-white p-5 pt-6 pb-2.5 shadow-default sm:px-7.5 xl:pb-1">
         <h4 className="mb-6 text-xl font-semibold text-black ">Code Promo</h4>
+        <div
+          className="flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
+          role="alert"
+        >
+          <svg
+            className="flex-shrink-0 inline w-4 h-4 me-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+          </svg>
+          <span className="sr-only">Info</span>
+          <div>
+            <span className="font-medium mr-2">CODES UTILISABLES :</span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              10
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              11
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              25
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              22
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              23
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              27
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              50
+            </span>
+            <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
+              30
+            </span>
+          </div>
+        </div>
 
         <div className="flex flex-col">
           <div className="grid grid-cols-3 rounded-sm bg-gray-2  sm:grid-cols-5">
             <div className="p-2.5 xl:p-5">
-              <h5 className="text-sm font-medium uppercase xsm:text-base">
-                Partenaires
-              </h5>
-            </div>
-            <div className="p-2.5 text-center xl:p-5">
               <h5 className="text-sm font-medium uppercase xsm:text-base">
                 Codes
               </h5>
             </div>
             <div className="p-2.5 text-center xl:p-5">
               <h5 className="text-sm font-medium uppercase xsm:text-base">
-                State
+                Points
+              </h5>
+            </div>
+            <div className="p-2.5 text-center xl:p-5">
+              <h5 className="text-sm font-medium uppercase xsm:text-base">
+                Active
               </h5>
             </div>
           </div>
 
-          <div className={`grid grid-cols-3 sm:grid-cols-5`}>
-            <div className="flex items-center gap-3 p-2.5 xl:p-5">
-              <p className="hidden text-black  sm:block">Siloe</p>
+          {getListCodes.map((data, index) => (
+            <div className={`grid grid-cols-3 sm:grid-cols-5 py-2`} key={index}>
+              <div className="flex items-center gap-3 p-2.5 xl:p-5">
+                <p className="hidden text-black  sm:block">{data.code}</p>
+              </div>
+              <div className="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
+                <p className="text-black ">{data.point}</p>
+              </div>
+              <span className="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded me-2 dark:bg-gray-700 dark:text-gray-400 border border-gray-500 ">
+                Active
+              </span>
             </div>
-
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black ">versebox10</p>
-            </div>
-
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-meta-3">active</p>
-            </div>
-          </div>
-          <div className={`grid grid-cols-3 sm:grid-cols-5`}>
-            <div className="flex items-center gap-3 p-2.5 xl:p-5">
-              <p className="hidden text-black  sm:block">Memohim</p>
-            </div>
-
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black ">versebox10</p>
-            </div>
-
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-meta-3">active</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </DefaultLayout>

@@ -15,6 +15,7 @@ export function FirebaseProvider({ children }) {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [dataNavBar, setDataNavBar] = useState([]);
+  const [getListCodes, setGetListCodes] = useState([]);
 
   useEffect(() => {
     // Fonction pour récupérer les données de la base de données Firebase
@@ -34,7 +35,6 @@ export function FirebaseProvider({ children }) {
       const getItemsActiveNavBar = ref(db, `isActiveGame/`);
       onValue(getItemsActiveNavBar, (snapshot) => {
         const data = snapshot.val();
-        console.log("🚀 ~ onValue ~ data:", data);
         setDataNavBar(data);
       });
 
@@ -49,6 +49,12 @@ export function FirebaseProvider({ children }) {
         const data = snapshot.val();
         setUsers(data);
       });
+
+      const getListCodesRef = ref(db, `RewardCodes/`);
+      onValue(getListCodesRef, (snapshot) => {
+        const data = snapshot.val();
+        setGetListCodes(data);
+      });
     };
 
     fetchData();
@@ -60,6 +66,7 @@ export function FirebaseProvider({ children }) {
     data,
     users,
     dataNavBar,
+    getListCodes,
   };
 
   return (
