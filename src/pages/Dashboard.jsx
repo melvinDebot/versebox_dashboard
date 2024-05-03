@@ -52,7 +52,7 @@ const Dashboard = () => {
       // Accéder à l'objet utilisateur et vérifier le champ 'gender'
       if (userObject.user.gender === "man") {
         maleCount++; // Incrémenter le compteur pour les hommes
-      } else if (userObject.user.gender === "woman") {
+      } else if (userObject.user.gender === "women") {
         femaleCount++; // Incrémenter le compteur pour les femmes
       }
     });
