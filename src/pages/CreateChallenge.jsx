@@ -153,7 +153,6 @@ const CreateChallenge = () => {
                   >
                     <option
                       value=""
-                      disabled
                       className="text-body dark:text-bodydark"
                     >
                       Select your category
@@ -258,7 +257,6 @@ const CreateChallenge = () => {
                   >
                     <option
                       value=""
-                      disabled
                       className="text-body dark:text-bodydark"
                     >
                       Select your points
@@ -321,7 +319,6 @@ const CreateChallenge = () => {
                   >
                     <option
                       value=""
-                      disabled
                       className="text-body dark:text-bodydark"
                     >
                       Select your level
