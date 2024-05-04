@@ -2,15 +2,12 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import DefaultLayout from "../layout/DefaultLayout";
 import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 const UpdateUser = () => {
   let { id } = useParams();
   const location = useLocation();
-
-  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
   const [objectUser, setObjectUser] = useState(location.state);
 
@@ -19,7 +16,7 @@ const UpdateUser = () => {
       update(ref(db, `/users/${id}/user`), {
         ...objectUser,
       });
-      setShowAlert(true);
+      alert("User updated successfully!");
       setTimeout(() => {
         navigate(`/dashboard`);
       }, 2000);
@@ -28,15 +25,31 @@ const UpdateUser = () => {
     }
   };
 
+  const revertDateFormat = (dateString) => {
+    // Vérifier si la chaîne de caractères est non vide
+    if (!dateString) {
+        return null;
+    }
+    
+    // Séparer la date initiale en année, mois et jour
+    const parts = dateString.split('-');
+    
+    // Vérifier si la date est valide (doit avoir trois parties)
+    if (parts.length !== 3) {
+        return null;
+    }
+    
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    
+    // Concaténer les parties dans le nouveau format "JJ/MM/AAAA"
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="User updated successfully!"
-          type="success"
-          description="You will be redirected to the dashboard."
-        />
-      )}
+
       <Breadcrumb pageName="UPDATE USER" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
@@ -82,6 +95,20 @@ const UpdateUser = () => {
                     placeholder="add link"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
                   />
+                </div>
+              </div>
+
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full">
+                  <label className="mb-2.5 block text-black ">
+                    Date
+                  </label>
+                  <input className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" type="date" id="start" name="trip-start"  onChange={(e) => {
+                      setObjectUser({
+                        ...objectUser,
+                        dateOfTheDay: revertDateFormat(e.target.value),
+                      });
+                    }} />
                 </div>
               </div>
 
