@@ -151,10 +151,7 @@ const CreateChallenge = () => {
                     }}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary `}
                   >
-                    <option
-                      value=""
-                      className="text-body dark:text-bodydark"
-                    >
+                    <option value="" className="text-body dark:text-bodydark">
                       Select your category
                     </option>
                     <option
@@ -255,10 +252,7 @@ const CreateChallenge = () => {
                     }}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary`}
                   >
-                    <option
-                      value=""
-                      className="text-body dark:text-bodydark"
-                    >
+                    <option value="" className="text-body dark:text-bodydark">
                       Select your points
                     </option>
                     <option value={6} className="text-body dark:text-bodydark">
@@ -304,7 +298,7 @@ const CreateChallenge = () => {
               </div>
 
               <div className="mb-4.5">
-                <label className="mb-2.5 block text-black "> Level </label>
+                <label className="mb-2.5 block text-black"> Level </label>
 
                 <div className="relative z-20 bg-transparent">
                   <select
@@ -317,10 +311,7 @@ const CreateChallenge = () => {
                     }}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary`}
                   >
-                    <option
-                      value=""
-                      className="text-body dark:text-bodydark"
-                    >
+                    <option value="" className="text-body dark:text-bodydark">
                       Select your level
                     </option>
                     <option

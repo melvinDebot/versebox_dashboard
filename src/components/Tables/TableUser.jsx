@@ -1,12 +1,35 @@
 import { useState } from "react";
 import { PropTypes } from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { db } from "../../../firebase";
+import { ref, remove } from "firebase/database";
 
 const TableUser = ({ list }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
   const navigate = useNavigate();
+
+  const handleDelete = (path) => {
+    // Créer une référence à l'objet avec le chemin spécifié dans Firebase
+    const itemRef = ref(db, `users/${path}`);
+
+    // Supprimer l'objet
+    remove(itemRef)
+      .then(() => {
+        console.log("Suppression réussie!");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la suppression:", error);
+      });
+  };
+
+  const confirmDelete = (path) => {
+    // Afficher une boîte de dialogue de confirmation
+    if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+      handleDelete(path);
+    }
+  };
 
   // // Filtrer les éléments en fonction du terme de recherche
   const filteredList = Object.values(list).filter(
@@ -97,12 +120,20 @@ const TableUser = ({ list }) => {
                   >
                     Edit
                   </button>
+                  <button
+                    onClick={() => confirmDelete(item.user.uuidUser)}
+                    type="button"
+                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
       <div className="flex justify-center mt-4 space-x-2 flex-wrap gap-5">
         {Array.from(
           { length: Math.ceil(filteredList.length / itemsPerPage) },
