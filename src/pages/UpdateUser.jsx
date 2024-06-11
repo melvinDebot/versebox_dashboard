@@ -28,28 +28,27 @@ const UpdateUser = () => {
   const revertDateFormat = (dateString) => {
     // Vérifier si la chaîne de caractères est non vide
     if (!dateString) {
-        return null;
+      return null;
     }
-    
+
     // Séparer la date initiale en année, mois et jour
-    const parts = dateString.split('-');
-    
+    const parts = dateString.split("-");
+
     // Vérifier si la date est valide (doit avoir trois parties)
     if (parts.length !== 3) {
-        return null;
+      return null;
     }
-    
+
     const year = parts[0];
     const month = parts[1];
     const day = parts[2];
-    
+
     // Concaténer les parties dans le nouveau format "JJ/MM/AAAA"
     return `${day}/${month}/${year}`;
-  }
+  };
 
   return (
     <DefaultLayout>
-
       <Breadcrumb pageName="UPDATE USER" />
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
@@ -100,15 +99,19 @@ const UpdateUser = () => {
 
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Date
-                  </label>
-                  <input className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" type="date" id="start" name="trip-start"  onChange={(e) => {
+                  <label className="mb-2.5 block text-black ">Date</label>
+                  <input
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    type="date"
+                    id="start"
+                    name="trip-start"
+                    onChange={(e) => {
                       setObjectUser({
                         ...objectUser,
                         dateOfTheDay: revertDateFormat(e.target.value),
                       });
-                    }} />
+                    }}
+                  />
                 </div>
               </div>
 

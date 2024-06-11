@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
+import "./App.css";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
@@ -21,6 +22,7 @@ import CreateProduct from "./pages/CreateProduct";
 import UpdateProduct from "./pages/UpdateProduct";
 import UpdateEvent from "./pages/UpdateEvent";
 import UpdateUser from "./pages/UpdateUser";
+import Loading from "./components/Loading/Loading";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,7 +38,11 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Afficher un indicateur de chargement pendant que Firebase vérifie l'état de connexion
+    return (
+      <div className="container-loader">
+        <Loading />
+      </div>
+    ); // Afficher un indicateur de chargement pendant que Firebase vérifie l'état de connexion
   }
 
   //eslint-disable-next-line
