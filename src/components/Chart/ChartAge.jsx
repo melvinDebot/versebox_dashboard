@@ -43,7 +43,7 @@ const options = {
   },
 
   xaxis: {
-    categories: ["18-29", "30-44", "45-59", "60+"],
+    categories: ["15-17", "18-25", "26-35", "36+"],
   },
   legend: {
     position: "top",
@@ -66,9 +66,7 @@ const ChartAge = ({ series }) => {
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default xl:col-span-4">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
-          <h4 className="text-xl font-semibold text-black e">
-            Profit this week
-          </h4>
+          <h4 className="text-xl font-semibold text-black e">Age users</h4>
         </div>
         <div>
           <div className="relative z-20 inline-block">

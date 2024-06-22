@@ -62,49 +62,46 @@ const Dashboard = () => {
   }
 
   function calculateAgeRanges(usersArray) {
-    // Définir les tranches d'âge
-    const ageRanges = {
-      "18-29": [],
-      "30-44": [],
-      "45-59": [],
-      "60+": [],
-    };
+    const yearCounts = {};
 
-    // Obtenir l'année actuelle
-    const currentYear = new Date().getFullYear();
-
-    // Parcourir chaque utilisateur pour classer son âge
+    // Parcourir chaque utilisateur pour compter les années de naissance
     usersArray.forEach((userObject) => {
       const birthDate = userObject.user.age;
       if (birthDate) {
-        // Vérifier que la date de naissance est définie
-        const birthYear = parseInt(birthDate.substring(0, 4));
-        const age = currentYear - birthYear; // Calcul de l'âge
-
-        // Classer par tranche d'âge
-        if (age >= 18 && age <= 29) {
-          ageRanges["18-29"].push(age);
-        } else if (age >= 30 && age <= 44) {
-          ageRanges["30-44"].push(age);
-        } else if (age >= 45 && age <= 59) {
-          ageRanges["45-59"].push(age);
-        } else if (age >= 60) {
-          ageRanges["60+"].push(age);
+        const year = new Date(birthDate).getFullYear();
+        if (yearCounts[year]) {
+          yearCounts[year]++;
+        } else {
+          yearCounts[year] = 1;
         }
       }
     });
 
-    // Calculer la moyenne pour chaque tranche ou retourner null si vide
-    const averages = Object.keys(ageRanges).map((range) => {
-      const ages = ageRanges[range];
-      if (ages.length === 0) return 0; // Retourner null si aucune donnée n'est présente dans la tranche
-      return Math.round(
-        ages.reduce((sum, current) => sum + current, 0) / ages.length,
-      );
+    // Transformer l'objet yearCounts en un tableau d'objets
+    const yearData = Object.keys(yearCounts).map((year) => ({
+      year: parseInt(year, 10),
+      count: yearCounts[year],
+    }));
+
+    // Calculer l'âge actuel des utilisateurs
+    const currentYear = new Date().getFullYear();
+    const ageRanges = [0, 0, 0, 0]; // [15-17, 18-25, 26-35, 36-40]
+
+    yearData.forEach(({ year, count }) => {
+      const age = currentYear - year;
+      if (age >= 15 && age <= 17) {
+        ageRanges[0] += count;
+      } else if (age >= 18 && age <= 25) {
+        ageRanges[1] += count;
+      } else if (age >= 26 && age <= 35) {
+        ageRanges[2] += count;
+      } else if (age >= 36 && age <= 40) {
+        ageRanges[3] += count;
+      }
     });
 
     // Créer le tableau d'objet pour le résultat final
-    return [{ name: "âge", data: averages }];
+    return [{ name: "âge", data: ageRanges }];
   }
 
   const counts = countUsersByCategory(users);
