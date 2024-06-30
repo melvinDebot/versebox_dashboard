@@ -382,7 +382,10 @@ const Dashboard = () => {
           </div>
 
           {getListCodes.map((data, index) => (
-            <div className={`grid grid-cols-3 sm:grid-cols-5 py-2 gap-1.5`} key={index}>
+            <div
+              className={`grid grid-cols-3 sm:grid-cols-5 py-2 gap-1.5`}
+              key={index}
+            >
               <div className="flex items-center gap-3 p-2.5 xl:p-5">
                 <p className=" text-black  sm:block truncate">{data.code}</p>
               </div>

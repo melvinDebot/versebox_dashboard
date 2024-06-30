@@ -265,7 +265,7 @@ const SignIn = () => {
           </div>
         </div>
       </div>
-      <p className="text-center p-1">Version 1.3.3</p>
+      <p className="text-center p-1">Version 1.3.4</p>
     </div>
   );
 };
