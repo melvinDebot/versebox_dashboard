@@ -382,14 +382,14 @@ const Dashboard = () => {
           </div>
 
           {getListCodes.map((data, index) => (
-            <div className={`grid grid-cols-3 sm:grid-cols-5 py-2`} key={index}>
+            <div className={`grid grid-cols-3 sm:grid-cols-5 py-2 gap-1.5`} key={index}>
               <div className="flex items-center gap-3 p-2.5 xl:p-5">
-                <p className="hidden text-black  sm:block">{data.code}</p>
+                <p className=" text-black  sm:block truncate">{data.code}</p>
               </div>
               <div className="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
                 <p className="text-black ">{data.point}</p>
               </div>
-              <span className="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded me-2 dark:bg-gray-700 dark:text-gray-400 border border-gray-500 ">
+              <span className="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded me-2 dark:bg-gray-700 dark:text-gray-400 border border-gray-500 truncate">
                 Active
               </span>
             </div>
