@@ -22,25 +22,36 @@ const Dashboard = () => {
   };
 
   function countUsersByCategory(users) {
-    const categoriesCount = {};
+    const categoriesCount = {
+      spiritualité: 0,
+      motivation: 0,
+      mental: 0,
+      relationel: 0,
+    };
 
     // Parcourir tous les utilisateurs
     Object.values(users).forEach((user) => {
       const category = user.user.category;
 
-      // Vérifier si la catégorie existe déjà dans le compteur, sinon initialiser à zéro
-      if (!categoriesCount[category]) {
-        categoriesCount[category] = 0;
+      // Si la catégorie est l'une des 4, on la prend en compte
+      if (Object.prototype.hasOwnProperty.call(categoriesCount, category)) {
+        categoriesCount[category]++;
       }
-
-      // Incrémenter le compteur pour cette catégorie
-      categoriesCount[category]++;
     });
 
-    // Créer un tableau des nombres d'utilisateurs par catégorie
-    const countsArray = Object.values(categoriesCount);
+    // Calcul du total des utilisateurs dans ces catégories
+    const totalUsers = Object.values(categoriesCount).reduce(
+      (acc, count) => acc + count,
+      0,
+    );
 
-    return countsArray;
+    // Calculer les parts de 100 selon chaque catégorie
+    const countsArray = Object.keys(categoriesCount).map((category) => {
+      const percentage = (categoriesCount[category] / totalUsers) * 100;
+      return Math.round(percentage); // On arrondit à l'entier le plus proche
+    });
+
+    return countsArray; // Renvoie un tableau des parts pour chaque catégorie
   }
 
   function countGenders(usersArray) {
@@ -57,8 +68,17 @@ const Dashboard = () => {
       }
     });
 
-    // Retourner un tableau avec les deux compteurs
-    return [maleCount, femaleCount];
+    // Calculer le total des utilisateurs valides (hommes et femmes)
+    const totalUsers = maleCount + femaleCount;
+
+    // Calculer les pourcentages pour chaque catégorie
+    const malePercentage = (maleCount / totalUsers) * 100;
+
+    // Arrondir les valeurs pour s'assurer que la somme fait 100
+    const roundedMalePercentage = Math.round(malePercentage);
+    const roundedFemalePercentage = 100 - roundedMalePercentage; // Assurer que la somme soit toujours 100
+
+    return [roundedMalePercentage, roundedFemalePercentage];
   }
 
   function calculateAgeRanges(usersArray) {

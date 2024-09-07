@@ -6,7 +6,7 @@ const options = {
     fontFamily: "Satoshi, sans-serif",
     type: "donut",
   },
-  colors: ["#049C0A", "#52B196"],
+  colors: ["#21B7EC", "#106EE3"],
   labels: ["Homme", "Femme"],
   legend: {
     show: false,
@@ -46,7 +46,7 @@ const options = {
 
 const ChartGender = ({ series }) => {
   return (
-    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default xl:col-span-5">
+    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default xl:col-span-8">
       <div className="mb-3 justify-between gap-4 sm:flex">
         <div>
           <h5 className="text-xl font-semibold text-black ">Gender User</h5>
@@ -63,7 +63,7 @@ const ChartGender = ({ series }) => {
       <div className="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#049C0A]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#21B7EC]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
               <span> Homme </span>
               <span> {series[0]}% </span>
@@ -72,7 +72,7 @@ const ChartGender = ({ series }) => {
         </div>
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#52B196]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#106EE3]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
               <span> Femme</span>
               <span> {series[1]}% </span>

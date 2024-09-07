@@ -7,7 +7,7 @@ const options = {
     type: "donut",
   },
   colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF"],
-  labels: ["Motivation", "Mental", "Spiritualité", "Relationnel"],
+  labels: ["Spiritualité", "Motivation", "Mental", "Relationnel"],
   legend: {
     show: false,
     position: "bottom",
@@ -46,7 +46,7 @@ const options = {
 
 const ChartCategory = ({ series }) => {
   return (
-    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default xl:col-span-5">
+    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default xl:col-span-8">
       <div className="mb-3 justify-between gap-4 sm:flex">
         <div>
           <h5 className="text-xl font-semibold text-black ">
@@ -67,7 +67,7 @@ const ChartCategory = ({ series }) => {
           <div className="flex w-full items-center">
             <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
-              <span> Motivation </span>
+              <span> Spiritualité </span>
               <span> {series[0]}% </span>
             </p>
           </div>
@@ -76,8 +76,8 @@ const ChartCategory = ({ series }) => {
           <div className="flex w-full items-center">
             <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#6577F3]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
-              <span> Mental</span>
-              <span> {series[4]}% </span>
+              <span> Motivation</span>
+              <span> {series[1]}% </span>
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ const ChartCategory = ({ series }) => {
           <div className="flex w-full items-center">
             <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#8FD0EF]"></span>
             <p className="flex w-full justify-between text-sm font-medium text-black ">
-              <span> Spiritualité </span>
+              <span> Mental </span>
               <span> {series[2]}% </span>
             </p>
           </div>
