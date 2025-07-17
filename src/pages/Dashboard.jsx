@@ -31,7 +31,7 @@ const Dashboard = () => {
 
     // Parcourir tous les utilisateurs
     Object.values(users).forEach((user) => {
-      const category = user.user.category;
+      const category = user.user?.category;
 
       // Si la catégorie est l'une des 4, on la prend en compte
       if (Object.prototype.hasOwnProperty.call(categoriesCount, category)) {
@@ -61,9 +61,9 @@ const Dashboard = () => {
     // Parcourir chaque objet dans le tableau
     usersArray.forEach((userObject) => {
       // Accéder à l'objet utilisateur et vérifier le champ 'gender'
-      if (userObject.user.gender === "man") {
+      if (userObject.user?.gender === "man") {
         maleCount++; // Incrémenter le compteur pour les hommes
-      } else if (userObject.user.gender === "women") {
+      } else if (userObject.user?.gender === "women") {
         femaleCount++; // Incrémenter le compteur pour les femmes
       }
     });
@@ -86,7 +86,7 @@ const Dashboard = () => {
 
     // Parcourir chaque utilisateur pour compter les années de naissance
     usersArray.forEach((userObject) => {
-      const birthDate = userObject.user.age;
+      const birthDate = userObject.user?.age;
       if (birthDate) {
         const year = new Date(birthDate).getFullYear();
         if (yearCounts[year]) {
