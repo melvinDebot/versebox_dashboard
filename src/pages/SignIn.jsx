@@ -283,7 +283,7 @@ const SignIn = () => {
           </form>
         </div>
       </div>
-      <p className="text-center p-1">Version 1.3.5</p>
+      <p className="text-center p-1">Version 1.4.0</p>
     </div>
   );
 };
