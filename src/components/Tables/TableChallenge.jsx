@@ -76,5 +76,5 @@ const TableChallenge = ({ list }) => {
 export default TableChallenge;
 
 TableChallenge.propTypes = {
-  list: PropTypes.array,
+  list: PropTypes.objectOf(PropTypes.array).isRequired,
 };
