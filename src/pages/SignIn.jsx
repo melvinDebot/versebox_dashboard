@@ -10,33 +10,45 @@ import { useNavigate } from "react-router-dom";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const allowedEmails = ["Marvin@gmail.com"];
 
   const handleSignIn = () => {
-    if (allowedEmails.includes(email)) {
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          const user = auth.currentUser;
-          if (user) {
-            const uid = user.uid;
-            const dbRef = ref(db, `users/${uid}/user`);
-            onValue(dbRef, (snapshot) => {
-              const data = snapshot.val();
-              if (data) {
-                // Sauvegarde des données de l'utilisateur dans le localStorage
-                localStorage.setItem("user", JSON.stringify(data));
-              }
-            });
-          }
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 500);
-        })
-        .catch((err) => alert(err.message));
-    } else {
+    if (isLoading) return;
+
+    if (!allowedEmails.includes(email)) {
       alert("Email non autorisé");
+      return;
     }
+
+    setIsLoading(true);
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        const user = auth.currentUser;
+        if (user) {
+          const uid = user.uid;
+          const dbRef = ref(db, `users/${uid}/user`);
+          onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              // Sauvegarde des données de l'utilisateur dans le localStorage
+              localStorage.setItem("user", JSON.stringify(data));
+            }
+          });
+        }
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
+      })
+      .catch((err) => alert(err.message))
+      .finally(() => setIsLoading(false));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    handleSignIn();
   };
 
   return (
@@ -180,7 +192,10 @@ const SignIn = () => {
         </div>
 
         <div className="w-full border-stroke xl:w-1/2 xl:border-l-2">
-          <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full p-4 sm:p-12.5 xl:p-17.5"
+          >
             <span className="mb-1.5 block font-medium">Start for free</span>
             <h2 className="mb-9 text-2xl font-bold text-black sm:text-title-xl2">
               Sign In to versebox dashboard
@@ -256,13 +271,16 @@ const SignIn = () => {
 
             <div className="mb-5">
               <button
-                onClick={() => handleSignIn()}
-                className="w-full cursor-pointer rounded-lg border border-primary text-white bg-blue-700 p-4 transition hover:bg-opacity-90"
+                type="submit"
+                disabled={isLoading}
+                className={`w-full rounded-lg border border-primary text-white bg-blue-700 p-4 transition hover:bg-opacity-90 ${
+                  isLoading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"
+                }`}
               >
-                Connect
+                {isLoading ? "Connexion en cours..." : "Connect"}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
       <p className="text-center p-1">Version 1.3.5</p>

@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-100 text-black transition-colors duration-300 dark:bg-slate-900 dark:text-bodydark;
+  }
+
+  .dark .bg-white {
+    @apply bg-boxdark;
+  }
+
+  .dark .border-stroke {
+    @apply border-strokedark;
+  }
+
+  .dark .text-black {
+    @apply text-white;
+  }
+
+  .dark .text-body {
+    @apply text-bodydark;
+  }
+
+  .dark .bg-meta-2 {
+    @apply bg-meta-4;
+  }
+
+  .dark .bg-gray {
+    @apply bg-slate-700;
+  }
+
+  .dark .shadow-default {
+    @apply shadow-none;
+  }
+}

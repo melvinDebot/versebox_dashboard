@@ -51,20 +51,25 @@ const ChartGender = ({ series }) => {
     series.some((val) => isNaN(val));
 
   return (
-    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default xl:col-span-8">
+    <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default transition-colors duration-300 xl:col-span-8">
       <div className="mb-3 justify-between gap-4 sm:flex">
         <div>
           {loading ? (
             <div className="h-6 w-28 rounded bg-gray animate-pulse" />
           ) : (
-            <h5 className="text-xl font-semibold text-black">Gender User</h5>
+            <h5 className="text-xl font-semibold text-black transition-colors duration-300">
+              Gender User
+            </h5>
           )}
         </div>
         <div></div>
       </div>
 
       <div className="mb-2">
-        <div id="chartThree" className="mx-auto flex justify-center min-h-[250px] items-center">
+        <div
+          id="chartThree"
+          className="mx-auto flex justify-center min-h-[250px] items-center"
+        >
           {loading ? (
             <div className="w-full h-[250px] bg-gray rounded animate-pulse" />
           ) : (
@@ -77,7 +82,7 @@ const ChartGender = ({ series }) => {
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
             <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#21B7EC]"></span>
-            <p className="flex w-full justify-between text-sm font-medium text-black">
+            <p className="flex w-full justify-between text-sm font-medium text-black transition-colors duration-300">
               <span> Homme </span>
               <span>{loading ? "--" : `${series[0]}%`}</span>
             </p>
@@ -86,7 +91,7 @@ const ChartGender = ({ series }) => {
         <div className="sm:w-1/2 w-full px-8">
           <div className="flex w-full items-center">
             <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#106EE3]"></span>
-            <p className="flex w-full justify-between text-sm font-medium text-black">
+            <p className="flex w-full justify-between text-sm font-medium text-black transition-colors duration-300">
               <span> Femme </span>
               <span>{loading ? "--" : `${series[1]}%`}</span>
             </p>

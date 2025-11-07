@@ -31,30 +31,42 @@ const TableEvent = ({ list }) => {
   // Gérer le changement de page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default">
+    <div className="rounded-sm border border-stroke bg-white shadow-default transition-colors duration-300 dark:border-strokedark dark:bg-boxdark">
       <div className="py-6 px-4 md:px-6 xl:px-7.5">
-        <h4 className="text-xl font-semibold text-black ">Event list</h4>
+        <h4 className="text-xl font-semibold text-black dark:text-white">
+          Event list
+        </h4>
         <input
           type="text"
           placeholder="Rechercher un event..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md transition-colors duration-300 focus:outline-none focus:ring-primary focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white dark:placeholder:text-bodydark"
         />
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white transition-colors duration-300 dark:bg-boxdark">
           <thead>
-            <tr className="w-full border-t border-stroke py-4.5 px-4 dark:border-strokedark md:px-6 2xl:px-7.5">
-              <th className="py-2 px-4 text-left font-medium">Event Name</th>
-              <th className="py-2 px-4 text-left font-medium hidden sm:table-cell">
+            <tr className="w-full border-t border-stroke bg-gray-2 py-4.5 px-4 transition-colors duration-300 dark:border-strokedark dark:bg-boxdark-2 md:px-6 2xl:px-7.5">
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Event Name
+              </th>
+              <th className="hidden py-2 px-4 text-left font-medium text-black dark:text-white sm:table-cell">
                 Date
               </th>
-              <th className="py-2 px-4 text-left font-medium">Épinglé</th>
-              <th className="py-2 px-4 text-left font-medium">Location</th>
-              <th className="py-2 px-4 text-left font-medium">ID</th>
-              <th className="py-2 px-4 text-left font-medium">Actions</th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Épinglé
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Location
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                ID
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -88,11 +100,15 @@ const TableEvent = ({ list }) => {
                       className={`object-cover w-28 rounded-md ${imageLoaded[key] ? "block" : "hidden"}`}
                       onLoad={() => handleImageLoad(key)}
                     />
-                    <p className="text-sm text-black">{event.title}</p>
+                    <p className="text-sm text-black dark:text-bodydark">
+                      {event.title}
+                    </p>
                   </div>
                 </td>
                 <td className="py-2 px-4 hidden sm:table-cell">
-                  <p className="text-sm text-black">{event.startDate}</p>
+                  <p className="text-sm text-black dark:text-bodydark">
+                    {event.startDate}
+                  </p>
                 </td>
                 <td className="py-2 px-4">
                   <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
@@ -100,7 +116,9 @@ const TableEvent = ({ list }) => {
                   </span>
                 </td>
                 <td className="py-2 px-4">
-                  <p className="text-sm text-black">{event.location}</p>
+                  <p className="text-sm text-black dark:text-bodydark">
+                    {event.location}
+                  </p>
                 </td>
                 <td className="py-2 px-4">
                   <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
@@ -131,7 +149,7 @@ const TableEvent = ({ list }) => {
             <button
               key={index}
               onClick={() => paginate(index + 1)}
-              className={`px-3 py-1 font-medium border border-gray-300 rounded-md focus:outline-none ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100"}`}
+              className={`px-3 py-1 font-medium border border-gray-300 rounded-md transition-colors duration-300 focus:outline-none dark:border-strokedark ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100 dark:hover:bg-boxdark-2"}`}
             >
               {index + 1}
             </button>

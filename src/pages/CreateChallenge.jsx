@@ -175,12 +175,14 @@ const CreateChallenge = () => {
                     <option
                       value="mental"
                       className="text-body dark:text-bodydark"
+                      disabled={true}
                     >
                       Mental
                     </option>
                     <option
                       value="motivation"
                       className="text-body dark:text-bodydark"
+                      disabled={true}
                     >
                       Motivation
                     </option>
@@ -193,6 +195,7 @@ const CreateChallenge = () => {
                     <option
                       value="relationel"
                       className="text-body dark:text-bodydark"
+                      disabled={true}
                     >
                       Relationnel
                     </option>
@@ -205,6 +208,7 @@ const CreateChallenge = () => {
                     <option
                       value="spiritualité"
                       className="text-body dark:text-bodydark"
+                      disabled={true}
                     >
                       Spiritualité
                     </option>
