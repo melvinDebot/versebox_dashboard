@@ -21,7 +21,7 @@ const Dashboard = () => {
     return number;
   };
 
-  function countUsersByCategory(users) {
+  function countUsersByCategory(usersMap = {}) {
     const categoriesCount = {
       spiritualité: 0,
       motivation: 0,
@@ -29,64 +29,64 @@ const Dashboard = () => {
       relationel: 0,
     };
 
-    // Parcourir tous les utilisateurs
-    Object.values(users).forEach((user) => {
-      const category = user.user.category;
+    Object.values(usersMap || {}).forEach((userItem) => {
+      const category = userItem?.user?.category;
 
-      // Si la catégorie est l'une des 4, on la prend en compte
-      if (Object.prototype.hasOwnProperty.call(categoriesCount, category)) {
+      if (
+        category &&
+        Object.prototype.hasOwnProperty.call(categoriesCount, category)
+      ) {
         categoriesCount[category]++;
       }
     });
 
-    // Calcul du total des utilisateurs dans ces catégories
     const totalUsers = Object.values(categoriesCount).reduce(
       (acc, count) => acc + count,
       0,
     );
 
-    // Calculer les parts de 100 selon chaque catégorie
-    const countsArray = Object.keys(categoriesCount).map((category) => {
-      const percentage = (categoriesCount[category] / totalUsers) * 100;
-      return Math.round(percentage); // On arrondit à l'entier le plus proche
-    });
+    if (totalUsers === 0) {
+      return Object.keys(categoriesCount).map(() => 0);
+    }
 
-    return countsArray; // Renvoie un tableau des parts pour chaque catégorie
+    return Object.keys(categoriesCount).map((category) => {
+      const percentage = (categoriesCount[category] / totalUsers) * 100;
+      return Math.round(percentage);
+    });
   }
 
-  function countGenders(usersArray) {
+  function countGenders(usersArray = []) {
     let maleCount = 0;
     let femaleCount = 0;
 
-    // Parcourir chaque objet dans le tableau
     usersArray.forEach((userObject) => {
-      // Accéder à l'objet utilisateur et vérifier le champ 'gender'
-      if (userObject.user.gender === "man") {
-        maleCount++; // Incrémenter le compteur pour les hommes
-      } else if (userObject.user.gender === "women") {
-        femaleCount++; // Incrémenter le compteur pour les femmes
+      const gender = userObject?.user?.gender;
+
+      if (gender === "man") {
+        maleCount++;
+      } else if (gender === "women") {
+        femaleCount++;
       }
     });
 
-    // Calculer le total des utilisateurs valides (hommes et femmes)
     const totalUsers = maleCount + femaleCount;
 
-    // Calculer les pourcentages pour chaque catégorie
-    const malePercentage = (maleCount / totalUsers) * 100;
+    if (totalUsers === 0) {
+      return [0, 0];
+    }
 
-    // Arrondir les valeurs pour s'assurer que la somme fait 100
+    const malePercentage = (maleCount / totalUsers) * 100;
     const roundedMalePercentage = Math.round(malePercentage);
-    const roundedFemalePercentage = 100 - roundedMalePercentage; // Assurer que la somme soit toujours 100
+    const roundedFemalePercentage = 100 - roundedMalePercentage;
 
     return [roundedMalePercentage, roundedFemalePercentage];
   }
 
-  function calculateAgeRanges(usersArray) {
+  function calculateAgeRanges(usersArray = []) {
     const yearCounts = {};
 
-    // Parcourir chaque utilisateur pour compter les années de naissance
     usersArray.forEach((userObject) => {
-      const birthDate = userObject.user.age;
+      const birthDate = userObject?.user?.age;
       if (birthDate) {
         const year = new Date(birthDate).getFullYear();
         if (yearCounts[year]) {
@@ -97,13 +97,11 @@ const Dashboard = () => {
       }
     });
 
-    // Transformer l'objet yearCounts en un tableau d'objets
     const yearData = Object.keys(yearCounts).map((year) => ({
       year: parseInt(year, 10),
       count: yearCounts[year],
     }));
 
-    // Calculer l'âge actuel des utilisateurs
     const currentYear = new Date().getFullYear();
     const ageRanges = [0, 0, 0, 0]; // [15-17, 18-25, 26-35, 36-40]
 
@@ -120,7 +118,6 @@ const Dashboard = () => {
       }
     });
 
-    // Créer le tableau d'objet pour le résultat final
     return [{ name: "âge", data: ageRanges }];
   }
 
@@ -267,7 +264,7 @@ const Dashboard = () => {
                 style={{ backgroundColor: "grey" }}
                 className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900">
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-white">
                 {dataNavBar.isActivated
                   ? "Game is active"
                   : "Game is desactive"}
@@ -295,7 +292,7 @@ const Dashboard = () => {
                 style={{ backgroundColor: "grey" }}
                 className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900">
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-white">
                 {dataNavBar.isActiveEvent
                   ? "Event is active"
                   : "Event is desactive"}
@@ -316,7 +313,7 @@ const Dashboard = () => {
                 style={{ backgroundColor: "grey" }}
                 className="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"
               ></div>
-              <span className="ms-3 text-sm font-medium text-gray-900">
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-white">
                 {dataNavBar.isActiveStore
                   ? "store is active"
                   : "store is desactive"}
@@ -337,8 +334,10 @@ const Dashboard = () => {
 
       <div className="mt-4 grid grid-cols-3 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5"></div>
 
-      <div className="rounded-sm border border-stroke bg-white p-5 pt-6 pb-2.5 shadow-default sm:px-7.5 xl:pb-1">
-        <h4 className="mb-6 text-xl font-semibold text-black ">Code Promo</h4>
+      <div className="rounded-sm border border-stroke bg-white p-5 pt-6 pb-2.5 shadow-default transition-colors duration-300 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
+          Code Promo
+        </h4>
         <div
           className="flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
           role="alert"
@@ -354,7 +353,9 @@ const Dashboard = () => {
           </svg>
           <span className="sr-only">Info</span>
           <div className="flex flex-wrap gap-1">
-            <span className="font-medium mr-2">CODES UTILISABLES :</span>
+            <span className="font-medium mr-2 text-black dark:text-white">
+              CODES UTILISABLES :
+            </span>
             <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">
               10
             </span>
@@ -383,19 +384,19 @@ const Dashboard = () => {
         </div>
 
         <div className="flex flex-col">
-          <div className="grid grid-cols-3 rounded-sm bg-gray-2  sm:grid-cols-5">
+          <div className="grid grid-cols-3 rounded-sm bg-gray-2 transition-colors duration-300 dark:bg-boxdark-2 sm:grid-cols-5">
             <div className="p-2.5 xl:p-5">
-              <h5 className="text-sm font-medium uppercase xsm:text-base">
+              <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
                 Codes
               </h5>
             </div>
             <div className="p-2.5 text-center xl:p-5">
-              <h5 className="text-sm font-medium uppercase xsm:text-base">
+              <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
                 Points
               </h5>
             </div>
             <div className="p-2.5 text-center xl:p-5">
-              <h5 className="text-sm font-medium uppercase xsm:text-base">
+              <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
                 Active
               </h5>
             </div>
@@ -403,14 +404,16 @@ const Dashboard = () => {
 
           {getListCodes.map((data, index) => (
             <div
-              className={`grid grid-cols-3 sm:grid-cols-5 py-2 gap-1.5`}
+              className={`grid grid-cols-3 gap-1.5 py-2 sm:grid-cols-5`}
               key={index}
             >
               <div className="flex items-center gap-3 p-2.5 xl:p-5">
-                <p className=" text-black  sm:block truncate">{data.code}</p>
+                <p className="text-black dark:text-bodydark sm:block truncate">
+                  {data.code}
+                </p>
               </div>
               <div className="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
-                <p className="text-black ">{data.point}</p>
+                <p className="text-black dark:text-bodydark">{data.point}</p>
               </div>
               <span className="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded me-2 dark:bg-gray-700 dark:text-gray-400 border border-gray-500 truncate">
                 Active

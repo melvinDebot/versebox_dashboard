@@ -60,34 +60,34 @@ const TableUser = ({ list }) => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default sm:px-7.5 xl:pb-1">
+    <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default transition-colors duration-300 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
         <input
           type="text"
           placeholder="Rechercher un email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md transition-colors duration-300 focus:outline-none focus:ring-primary focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white dark:placeholder:text-bodydark"
         />
         <table className="w-full table-auto">
           <thead>
-            <tr className="bg-gray-2 text-left">
-              <th className="min-w-[150px] py-4 px-4 font-medium text-black ">
+            <tr className="bg-gray-2 text-left transition-colors duration-300 dark:bg-boxdark-2">
+              <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
                 Email
               </th>
-              <th className="min-w-[150px] py-4 px-4 font-medium text-black ">
+              <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
                 name
               </th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                 Streaks
               </th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                 Points
               </th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                 Uuid user
               </th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black ">
+              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                 Edit
               </th>
             </tr>
@@ -96,10 +96,14 @@ const TableUser = ({ list }) => {
             {currentItems.map((item, key) => (
               <tr key={key}>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black ">{item.user.email}</p>
+                  <p className="text-black dark:text-bodydark">
+                    {item.user.email}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <p className="text-black ">{item.user.nameUser}</p>
+                  <p className="text-black dark:text-bodydark">
+                    {item.user.nameUser}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
@@ -117,7 +121,7 @@ const TableUser = ({ list }) => {
                     <input
                       id={`npm-install-${item.user.uuidUser}`}
                       type="text"
-                      className="truncate col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="truncate col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-strokedark dark:bg-boxdark-2 dark:text-bodydark dark:placeholder:text-bodydark dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={item.user.uuidUser}
                       disabled
                     />
@@ -195,7 +199,7 @@ const TableUser = ({ list }) => {
             <button
               key={index}
               onClick={() => paginate(index + 1)}
-              className={`px-3 py-1 font-medium border border-gray-300 rounded-md focus:outline-none ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100"}`}
+              className={`px-3 py-1 font-medium border border-gray-300 rounded-md transition-colors duration-300 focus:outline-none dark:border-strokedark ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100 dark:hover:bg-boxdark-2"}`}
             >
               {index + 1}
             </button>

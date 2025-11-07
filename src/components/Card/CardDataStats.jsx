@@ -11,8 +11,8 @@ const CardDataStats = ({
   const isLoading = total === null || total === undefined || total === 0;
 
   return (
-    <div className="rounded-sm border border-stroke bg-white py-6 px-7.5">
-      <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2">
+    <div className="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default transition-colors duration-300">
+      <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 transition-colors duration-300">
         {isLoading ? (
           <div className="h-8 w-8 rounded-full bg-gray animate-pulse" />
         ) : (
@@ -29,8 +29,12 @@ const CardDataStats = ({
             </>
           ) : (
             <>
-              <h4 className="text-title-md font-bold text-black">{total}</h4>
-              <span className="text-sm font-medium">{title}</span>
+              <h4 className="text-title-md font-bold text-black transition-colors duration-300">
+                {total}
+              </h4>
+              <span className="text-sm font-medium text-body transition-colors duration-300">
+                {title}
+              </span>
             </>
           )}
         </div>

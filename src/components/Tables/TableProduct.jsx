@@ -31,30 +31,42 @@ const TableProduct = ({ list }) => {
   // Gérer le changement de page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default">
+    <div className="rounded-sm border border-stroke bg-white shadow-default transition-colors duration-300 dark:border-strokedark dark:bg-boxdark">
       <div className="py-6 px-4 md:px-6 xl:px-7.5">
-        <h4 className="text-xl font-semibold text-black">Top Products</h4>
+        <h4 className="text-xl font-semibold text-black dark:text-white">
+          Top Products
+        </h4>
         <input
           type="text"
           placeholder="Rechercher un product..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+          className="block w-full px-4 py-2 mb-4 border border-gray-200 rounded-md transition-colors duration-300 focus:outline-none focus:ring-primary focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white dark:placeholder:text-bodydark"
         />
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white transition-colors duration-300 dark:bg-boxdark">
           <thead>
-            <tr className="w-full border-t border-stroke py-4.5 px-4 dark:border-strokedark md:px-6 2xl:px-7.5">
-              <th className="py-2 px-4 text-left font-medium">Product Name</th>
-              <th className="py-2 px-4 text-left font-medium hidden sm:table-cell">
+            <tr className="w-full border-t border-stroke bg-gray-2 py-4.5 px-4 transition-colors duration-300 dark:border-strokedark dark:bg-boxdark-2 md:px-6 2xl:px-7.5">
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Product Name
+              </th>
+              <th className="hidden py-2 px-4 text-left font-medium text-black dark:text-white sm:table-cell">
                 Category
               </th>
-              <th className="py-2 px-4 text-left font-medium">Price</th>
-              <th className="py-2 px-4 text-left font-medium">Sold</th>
-              <th className="py-2 px-4 text-left font-medium">ID</th>
-              <th className="py-2 px-4 text-left font-medium">Actions</th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Price
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Sold
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                ID
+              </th>
+              <th className="py-2 px-4 text-left font-medium text-black dark:text-white">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -89,14 +101,20 @@ const TableProduct = ({ list }) => {
                       onLoad={() => handleImageLoad(key)}
                     />
 
-                    <p className="text-sm text-black">{product.title}</p>
+                    <p className="text-sm text-black dark:text-bodydark">
+                      {product.title}
+                    </p>
                   </div>
                 </td>
                 <td className="py-2 px-4 hidden sm:table-cell">
-                  <p className="text-sm text-black">{product.category}</p>
+                  <p className="text-sm text-black dark:text-bodydark">
+                    {product.category}
+                  </p>
                 </td>
                 <td className="py-2 px-4">
-                  <p className="text-sm text-black">{product.price}€</p>
+                  <p className="text-sm text-black dark:text-bodydark">
+                    {product.price}€
+                  </p>
                 </td>
                 <td className="py-2 px-4">
                   <p className="text-sm text-meta-3">
@@ -132,7 +150,7 @@ const TableProduct = ({ list }) => {
             <button
               key={index}
               onClick={() => paginate(index + 1)}
-              className={`px-3 py-1 font-medium border border-gray-300 rounded-md focus:outline-none ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100"}`}
+              className={`px-3 py-1 font-medium border border-gray-300 rounded-md transition-colors duration-300 focus:outline-none dark:border-strokedark ${currentPage === index + 1 ? "bg-primary text-white" : "hover:bg-gray-100 dark:hover:bg-boxdark-2"}`}
             >
               {index + 1}
             </button>

@@ -50,17 +50,18 @@ const options = {
 
 const ChartAge = ({ series }) => {
   const isInvalidSeries =
-    !Array.isArray(series) ||
-  !Array.isArray(series[0]?.data)
+    !Array.isArray(series) || !Array.isArray(series[0]?.data);
 
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default xl:col-span-4">
+    <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default transition-colors duration-300 xl:col-span-4">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           {isInvalidSeries ? (
             <div className="h-6 w-24 rounded bg-gray animate-pulse" />
           ) : (
-            <h4 className="text-xl font-semibold text-black">Age users</h4>
+            <h4 className="text-xl font-semibold text-black transition-colors duration-300">
+              Age users
+            </h4>
           )}
         </div>
 
