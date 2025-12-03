@@ -157,6 +157,7 @@ const CreateChallenge = () => {
                     <option
                       value="amour"
                       className="text-body dark:text-bodydark"
+                      disabled={true}
                     >
                       Amour
                     </option>
