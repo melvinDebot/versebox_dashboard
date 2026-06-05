@@ -1,339 +1,184 @@
-import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { db } from "../../firebase";
-import { ref, update } from "firebase/database";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { ref, update } from "firebase/database";
+import { db } from "../../firebase";
+import DefaultLayout from "../layout/DefaultLayout";
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import Alert from "../components/Alert/Alert";
+import {
+  Card,
+  Button,
+  FormField,
+  Input,
+  Textarea,
+  Select,
+  AreaChart,
+} from "../ui";
+import { PRODUCT_CATEGORIES } from "../utils/constants";
 
-import ChartLine from "../components/Chart/ChartLine";
+const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+const clicksToSeries = (object, fallbackName) => {
+  if (!object?.clicksByDay) return [{ name: fallbackName, data: [] }];
+  const data = Array.isArray(object.clicksByDay)
+    ? object.clicksByDay.map((d) => d?.data ?? 0)
+    : DAYS.map((day) => object.clicksByDay[day]?.data ?? 0);
+  return [{ name: fallbackName || "Clics", data }];
+};
 
 const UpdateProduct = () => {
-  let { id } = useParams();
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const [form, setForm] = useState(location.state || {});
+  const [showAlert, setShowAlert] = useState(false);
 
-  const [objectProduct, setObjectProduct] = useState(location.state);
+  const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const setProduct = () => {
-    if (objectProduct.title !== "") {
-      update(ref(db, `/Store/${id}`), {
-        ...objectProduct,
-      });
-      alert("Product updated");
-      setTimeout(() => {
-        navigate(`/dashboard`);
-      }, 2000);
-    } else {
-      alert("Veuillez ajouter une categorie");
+  const submit = (e) => {
+    e.preventDefault();
+    if (!form.title) {
+      alert("Le titre est obligatoire");
+      return;
     }
-  };
-
-  const extractDataFromEventClicksByDay = (productObject) => {
-    if (productObject && productObject.clicksByDay) {
-      // Vérifie si clicksByDay est un objet et non null
-      return Object.keys(productObject.clicksByDay).map(
-        (day) => productObject.clicksByDay[day].data,
-      );
-    } else {
-      console.error(
-        "clicksByDay is not defined or is not an object:",
-        productObject,
-      );
-      return []; // Retourne un tableau vide si clicksByDay n'est pas un objet
-    }
+    update(ref(db, `/Store/${id}`), { ...form });
+    setShowAlert(true);
+    setTimeout(() => navigate("/dashboard"), 2000);
   };
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Update Product" />
-      <ChartLine
-        series={[
-          {
-            name: objectProduct.title,
-            data: extractDataFromEventClicksByDay(objectProduct),
-          },
-        ]}
+      <Alert
+        show={showAlert}
+        type="success"
+        message="Produit mis à jour"
+        description="Tu vas être redirigé vers le dashboard."
       />
-      <div className="grid grid-cols-1 gap-9">
-        <div className="flex flex-col gap-9">
-          {/* <!-- Contact Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default">
-            <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Update product {id}</h3>
+      <Breadcrumb pageName={`Édition — produit #${id}`} description={form.title} />
+
+      <div className="grid gap-6">
+        <Card padding="lg" radius="xl">
+          <header className="mb-3 flex items-center justify-between">
+            <div>
+              <h3 className="text-title-md font-semibold text-ink">
+                Clics par jour
+              </h3>
+              <p className="text-body-sm text-ink-muted">
+                {form.clicks || 0} clics au total
+              </p>
             </div>
-            <div className="p-6.5">
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Title <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectProduct.title}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        title: e.target.value,
-                      });
-                    }}
-                    placeholder="add a title"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
+          </header>
+          <AreaChart
+            series={clicksToSeries(form, form.title)}
+            categories={DAYS}
+            colors={["#D39E54"]}
+            height={260}
+          />
+        </Card>
 
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Description <span className="text-meta-1">*</span>
-                  </label>
-                  <textarea
-                    rows={6}
-                    value={objectProduct.description}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        description: e.target.value,
-                      });
-                    }}
-                    type="text"
-                    placeholder="add a description"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectProduct.link}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        link: e.target.value,
-                      });
-                    }}
-                    placeholder="add a link product"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link subscriber <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectProduct.subscriberDiscountLink}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        subscriberDiscountLink: e.target.value,
-                      });
-                    }}
-                    placeholder="add a link subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Text subscriber <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectProduct.subscriberDiscountText}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        subscriberDiscountText: e.target.value,
-                      });
-                    }}
-                    placeholder="add a text subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Price <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    defaultValue={objectProduct.price}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        price: parseFloat(e.target.value),
-                      });
-                    }}
-                    placeholder="add a price"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Price Subscriber <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    defaultValue={objectProduct.subcriberPrice}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        subcriberPrice: parseFloat(e.target.value),
-                      });
-                    }}
-                    placeholder="add a price subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Score User <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={objectProduct.score}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        score: parseInt(e.target.value, 10),
-                      });
-                    }}
-                    placeholder="add a score user"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link img <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectProduct.img}
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        img: e.target.value,
-                      });
-                    }}
-                    placeholder="add a link img"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5">
-                <label className="mb-2.5 block text-black "> Category </label>
-
-                <div className="relative z-20 bg-transparent">
-                  <select
-                    onChange={(e) => {
-                      setObjectProduct({
-                        ...objectProduct,
-                        category: e.target.value,
-                      });
-                    }}
-                    value={objectProduct.category}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary `}
-                  >
-                    <option
-                      value=""
-                      disabled
-                      className="text-body dark:text-bodydark"
-                    >
-                      Select your category
-                    </option>
-                    <option
-                      value="music"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Music
-                    </option>
-                    <option
-                      value="games"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Games
-                    </option>
-                    <option
-                      value="books"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Books
-                    </option>
-                    <option
-                      value="clothes"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Vetements
-                    </option>
-                    <option
-                      value="bag"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Sacs
-                    </option>
-                    <option
-                      value="various"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Divers
-                    </option>
-                  </select>
-
-                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
-                    <svg
-                      className="fill-current"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.8">
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
-                          fill=""
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setProduct()}
-                className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+        <Card padding="lg" radius="xl" className="max-w-3xl">
+          <form onSubmit={submit} className="flex flex-col gap-5">
+            <FormField label="Titre" required>
+              <Input
+                value={form.title || ""}
+                onChange={(e) => setField("title", e.target.value)}
+              />
+            </FormField>
+            <FormField label="Description">
+              <Textarea
+                rows={5}
+                value={form.description || ""}
+                onChange={(e) => setField("description", e.target.value)}
+              />
+            </FormField>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FormField label="Lien produit">
+                <Input
+                  value={form.link || ""}
+                  onChange={(e) => setField("link", e.target.value)}
+                  leftIcon="Link"
+                />
+              </FormField>
+              <FormField label="Lien abonné">
+                <Input
+                  value={form.subscriberDiscountLink || ""}
+                  onChange={(e) =>
+                    setField("subscriberDiscountLink", e.target.value)
+                  }
+                  leftIcon="Link"
+                />
+              </FormField>
+            </div>
+            <FormField label="Texte abonné">
+              <Input
+                value={form.subscriberDiscountText || ""}
+                onChange={(e) =>
+                  setField("subscriberDiscountText", e.target.value)
+                }
+              />
+            </FormField>
+            <div className="grid gap-5 sm:grid-cols-3">
+              <FormField label="Prix (€)">
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={form.price || ""}
+                  onChange={(e) =>
+                    setField("price", parseFloat(e.target.value))
+                  }
+                />
+              </FormField>
+              <FormField label="Prix abonné (€)">
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={form.subcriberPrice || ""}
+                  onChange={(e) =>
+                    setField("subcriberPrice", parseFloat(e.target.value))
+                  }
+                />
+              </FormField>
+              <FormField label="Score utilisateur">
+                <Input
+                  type="number"
+                  value={form.score || ""}
+                  onChange={(e) =>
+                    setField("score", parseInt(e.target.value, 10))
+                  }
+                />
+              </FormField>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FormField label="Catégorie">
+                <Select
+                  value={form.category || ""}
+                  onChange={(e) => setField("category", e.target.value)}
+                  options={PRODUCT_CATEGORIES}
+                  placeholder="Choisir une catégorie"
+                />
+              </FormField>
+              <FormField label="URL de l'image">
+                <Input
+                  value={form.img || ""}
+                  onChange={(e) => setField("img", e.target.value)}
+                  leftIcon="Image"
+                />
+              </FormField>
+            </div>
+            <div className="mt-2 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate(-1)}
               >
-                update product
-              </button>
+                Annuler
+              </Button>
+              <Button type="submit" variant="primary" leftIcon="Save">
+                Enregistrer
+              </Button>
             </div>
-          </div>
-        </div>
+          </form>
+        </Card>
       </div>
     </DefaultLayout>
   );

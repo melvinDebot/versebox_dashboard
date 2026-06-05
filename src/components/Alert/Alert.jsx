@@ -1,50 +1,64 @@
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
+import Icon from "../../ui/Icon";
 
-const Alert = ({ message, type, description, show }) => {
+const TONES = {
+  success: {
+    icon: "CircleCheck",
+    classes:
+      "border-success-700 bg-success-500 text-secondary-900 dark:bg-success-500 dark:border-success-300 dark:text-secondary-900",
+    iconClasses: "bg-white text-success-700",
+  },
+  error: {
+    icon: "CircleAlert",
+    classes:
+      "border-error-300 bg-error-50 text-error-900 dark:bg-error-900/30 dark:border-error-700 dark:text-error-50",
+    iconClasses: "bg-error-500 text-white",
+  },
+  warning: {
+    icon: "TriangleAlert",
+    classes:
+      "border-warning-300 bg-warning-50 text-warning-900 dark:bg-warning-900/30 dark:border-warning-700 dark:text-warning-50",
+    iconClasses: "bg-warning-500 text-white",
+  },
+  info: {
+    icon: "Info",
+    classes:
+      "border-secondary-300 bg-secondary-50 text-secondary-900 dark:bg-secondary-700 dark:border-secondary-500 dark:text-white",
+    iconClasses: "bg-secondary-500 text-white",
+  },
+};
+
+const Alert = ({ message, type = "success", description, show = true }) => {
+  if (!show) return null;
+  const tone = TONES[type] || TONES.info;
+
   return (
-    <>
-      {type === "success" && (
-        <div
-          className={`fixed top-10 left-0 right-0 flex justify-center z-999 transition-all duration-500 transform ${
-            show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"
-          }`}
-        >
-          <div className="flex w-full max-w-xl border-l-6 border-[#34D399] bg-[#34D399] bg-green-500 px-2 py-2 shadow-md md:p-9">
-            <div className="mr-5 flex h-9 w-full max-w-[32px] items-center justify-center rounded-lg bg-[#34D399]">
-              <svg
-                width="16"
-                height="12"
-                viewBox="0 0 16 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15.2984 0.826822L15.2868 0.811827L15.2741 0.797751C14.9173 0.401867 14.3238 0.400754 13.9657 0.794406L5.91888 9.45376L2.05667 5.2868C1.69856 4.89287 1.10487 4.89389 0.747996 5.28987C0.417335 5.65675 0.417335 6.22337 0.747996 6.59026L0.747959 6.59029L0.752701 6.59541L4.86742 11.0348C5.14445 11.3405 5.52858 11.5 5.89581 11.5C6.29242 11.5 6.65178 11.3355 6.92401 11.035L15.2162 2.11161C15.5833 1.74452 15.576 1.18615 15.2984 0.826822Z"
-                  fill="white"
-                  stroke="white"
-                ></path>
-              </svg>
-            </div>
-            <div className="w-full">
-              <h5 className="mb-3 text-lg font-semibold text-black">
-                {message}
-              </h5>
-              <p className="text-white leading-relaxed text-body">
-                {description}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <div
+      className={`fixed inset-x-0 top-6 z-50 mx-auto flex max-w-xl items-start gap-4 rounded-2xl border-2 px-6 py-5 shadow-lifted transition-all duration-300 animate-fade-in ${tone.classes}`}
+      role="alert"
+    >
+      <div
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone.iconClasses}`}
+      >
+        <Icon name={tone.icon} size="md" />
+      </div>
+      <div className="min-w-0 flex-1 py-0.5">
+        {message && (
+          <h5 className="text-title-sm font-semibold">{message}</h5>
+        )}
+        {description && (
+          <p className="mt-1 text-body-md opacity-90">{description}</p>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default Alert;
-
 Alert.propTypes = {
   message: PropTypes.string,
-  type: PropTypes.string,
+  type: PropTypes.oneOf(Object.keys(TONES)),
   description: PropTypes.string,
   show: PropTypes.bool,
 };
+
+export default Alert;

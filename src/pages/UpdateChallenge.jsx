@@ -1,363 +1,152 @@
-import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { db } from "../../firebase";
 import { ref, update } from "firebase/database";
+import { db } from "../../firebase";
+import DefaultLayout from "../layout/DefaultLayout";
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import Alert from "../components/Alert/Alert";
+import {
+  Card,
+  Button,
+  FormField,
+  Input,
+  Textarea,
+  Select,
+  Badge,
+  Icon,
+} from "../ui";
+import { CHALLENGE_POINTS, CHALLENGE_LEVELS } from "../utils/constants";
+
+const FIELD_TO_PATH = { relationnel: "relationel" };
+const PATH_TO_FIELD = { relationel: "relationnel" };
+
+const resolveCategory = (state) => {
+  const fieldCategory = state?.categories?.[0] || "";
+  const pathCategory =
+    state?._pathCategory || FIELD_TO_PATH[fieldCategory] || fieldCategory;
+  const persistedField = PATH_TO_FIELD[pathCategory] || pathCategory;
+  return { pathCategory, fieldCategory: persistedField };
+};
 
 const UpdateChallenge = () => {
   const navigate = useNavigate();
-  let { id } = useParams();
+  const { id } = useParams();
   const location = useLocation();
-  const [updatedChallengeData, setUpdatedChallengeData] = useState(
-    location.state,
-  );
+  const initial = location.state || {};
+  const [form, setForm] = useState(initial);
+  const [showAlert, setShowAlert] = useState(false);
 
-  const updatedChallengeToBdd = () => {
-    if (location.state.categories[0] != undefined) {
-      update(ref(db, `/dataIHM/${location.state.categories[0]}/${id}/`), {
-        ...updatedChallengeData,
-        categories:
-          location.state.categories[0] === "relationel"
-            ? ["relationnel"]
-            : location.state.categories[0],
-        like: 0,
-        unlike: 0,
-      });
-      alert("Challenge updated successfully");
-      setTimeout(() => {
-        navigate(`/dashboard`);
-      }, 1000);
-    } else {
-      alert("Veuillez ajouter une categorie");
+  const { pathCategory, fieldCategory } = resolveCategory(initial);
+
+  const setField = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!pathCategory) {
+      alert("Catégorie introuvable pour ce challenge");
+      return;
     }
+    update(ref(db, `/dataIHM/${pathCategory}/${id}/`), {
+      ...form,
+      categories: [fieldCategory],
+      like: form.like || 0,
+      unlike: form.unlike || 0,
+    });
+    setShowAlert(true);
+    setTimeout(() => navigate(`/tables-challenges/${pathCategory}`), 1500);
   };
 
   return (
     <DefaultLayout>
-      <Breadcrumb
-        pageName={`UPDATE :challenge ${id} ${location.state.categories[0]}`}
+      <Alert
+        show={showAlert}
+        type="success"
+        message="Challenge mis à jour"
+        description="Tu vas être redirigé vers la liste."
       />
-      <div className="grid grid-cols-1 gap-9">
-        <div className="flex flex-col gap-9">
-          {/* <!-- Contact Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default">
-            <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Update challenge</h3>
-            </div>
-            <div className="p-6.5">
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full xl:w-1/2">
-                  <label className="mb-2.5 block text-black ">
-                    Verset <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    defaultValue={location.state.verse}
-                    type="text"
-                    placeholder="Mathieu 2:11"
-                    onChange={(e) => {
-                      setUpdatedChallengeData({
-                        ...updatedChallengeData,
-                        verse: e.target.value,
-                      });
-                    }}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-              <div className="mb-6">
-                <label className="mb-2.5 block text-black ">
-                  Content <span className="text-meta-1">*</span>
-                </label>
-                <textarea
-                  rows={6}
-                  defaultValue={location.state.verseText}
-                  placeholder="Type your content"
-                  onChange={(e) => {
-                    setUpdatedChallengeData({
-                      ...updatedChallengeData,
-                      verseText: e.target.value,
-                    });
-                  }}
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                ></textarea>
-              </div>
-              <div className="mb-6">
-                <label className="mb-2.5 block text-black ">
-                  Explication <span className="text-meta-1">*</span>
-                </label>
-                <textarea
-                  rows={6}
-                  onChange={(e) => {
-                    setUpdatedChallengeData({
-                      ...updatedChallengeData,
-                      verseDescription: e.target.value,
-                    });
-                  }}
-                  defaultValue={location.state.verseDescription}
-                  placeholder="Type your explication"
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                ></textarea>
-              </div>
-              <div className="mb-6">
-                <label className="mb-2.5 block text-black ">
-                  Challenge <span className="text-meta-1">*</span>
-                </label>
-                <textarea
-                  rows={6}
-                  onChange={(e) => {
-                    setUpdatedChallengeData({
-                      ...updatedChallengeData,
-                      challenge: e.target.value,
-                    });
-                  }}
-                  defaultValue={location.state.challenge}
-                  placeholder="Type your challenge"
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                ></textarea>
-              </div>
+      <Breadcrumb
+        pageName={`Édition — challenge #${id}`}
+        description={fieldCategory ? `Catégorie : ${fieldCategory}` : undefined}
+      />
 
-              <div className="mb-4.5">
-                <label className="mb-2.5 block text-black "> Category </label>
-
-                <div className="relative z-20 bg-transparent">
-                  <select
-                    defaultValue={location.state.categories[0]}
-                    onChange={(e) => {
-                      setUpdatedChallengeData({
-                        ...updatedChallengeData,
-                        categories: [e.target.value],
-                      });
-                    }}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary `}
-                  >
-                    <option
-                      value=""
-                      disabled
-                      className="text-body dark:text-bodydark"
-                    >
-                      Select your category
-                    </option>
-                    <option
-                      value="amour"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Amour
-                    </option>
-                    <option
-                      value="familial"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Familial
-                    </option>
-                    <option
-                      value="finances"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Finances
-                    </option>
-                    <option
-                      value="mental"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Mental
-                    </option>
-                    <option
-                      value="motivation"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Motivation
-                    </option>
-                    <option
-                      value="organisation"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Organisation
-                    </option>
-                    <option
-                      value="relationel"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Relationnel
-                    </option>
-                    <option
-                      value="santé"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Santé
-                    </option>
-                    <option
-                      value="spiritualité"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Spiritualité
-                    </option>
-                  </select>
-
-                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
-                    <svg
-                      className="fill-current"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.8">
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
-                          fill=""
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-4.5">
-                <label className="mb-2.5 block text-black "> Points </label>
-
-                <div className="relative z-20 bg-transparent">
-                  <select
-                    defaultValue={
-                      location.state.point ? location.state.point : ""
-                    }
-                    onChange={(e) => {
-                      setUpdatedChallengeData({
-                        ...updatedChallengeData,
-                        point: parseInt(e.target.value, 10),
-                      });
-                    }}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary`}
-                  >
-                    <option
-                      value=""
-                      disabled
-                      className="text-body dark:text-bodydark"
-                    >
-                      Select your points
-                    </option>
-                    <option value={6} className="text-body dark:text-bodydark">
-                      6
-                    </option>
-                    <option value={8} className="text-body dark:text-bodydark">
-                      8
-                    </option>
-                    <option value={9} className="text-body dark:text-bodydark">
-                      9
-                    </option>
-                    <option value={12} className="text-body dark:text-bodydark">
-                      12
-                    </option>
-                    <option value={15} className="text-body dark:text-bodydark">
-                      15
-                    </option>
-                    <option value={17} className="text-body dark:text-bodydark">
-                      17
-                    </option>
-                  </select>
-
-                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
-                    <svg
-                      className="fill-current"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.8">
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
-                          fill=""
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-4.5">
-                <label className="mb-2.5 block text-black "> Level </label>
-
-                <div className="relative z-20 bg-transparent">
-                  <select
-                    defaultValue={
-                      updatedChallengeData?.state?.level
-                        ? updatedChallengeData?.state?.level
-                        : ""
-                    }
-                    onChange={(e) => {
-                      setUpdatedChallengeData({
-                        ...updatedChallengeData,
-                        level: e.target.value,
-                      });
-                    }}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary`}
-                  >
-                    <option
-                      value=""
-                      disabled
-                      className="text-body dark:text-bodydark"
-                    >
-                      Select your level
-                    </option>
-                    <option
-                      value="bronze"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Bronze
-                    </option>
-                    <option
-                      value="silver"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Silver
-                    </option>
-                    <option
-                      value="gold"
-                      className="text-body dark:text-bodydark"
-                    >
-                      Gold
-                    </option>
-                  </select>
-
-                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
-                    <svg
-                      className="fill-current"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.8">
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
-                          fill=""
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => updatedChallengeToBdd()}
-                className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
-              >
-                Update challenge
-              </button>
-            </div>
+      <Card padding="lg" radius="xl" className="max-w-3xl">
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-secondary-500 dark:bg-secondary-800">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
+            <Icon name="FolderOpen" size="sm" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-caption font-medium uppercase tracking-wide text-ink-muted">
+              Catégorie
+            </p>
+            <p className="text-title-sm font-semibold capitalize text-ink">
+              {fieldCategory || "—"}
+            </p>
           </div>
+          <Badge variant="neutral" size="sm">
+            <Icon name="Lock" size="xs" />
+            Non modifiable
+          </Badge>
         </div>
-      </div>
+
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <FormField label="Verset" required>
+            <Input
+              value={form.verse || ""}
+              onChange={(e) => setField("verse", e.target.value)}
+            />
+          </FormField>
+          <FormField label="Contenu du verset" required>
+            <Textarea
+              rows={5}
+              value={form.verseText || ""}
+              onChange={(e) => setField("verseText", e.target.value)}
+            />
+          </FormField>
+          <FormField label="Explication" required>
+            <Textarea
+              rows={5}
+              value={form.verseDescription || ""}
+              onChange={(e) => setField("verseDescription", e.target.value)}
+            />
+          </FormField>
+          <FormField label="Challenge" required>
+            <Textarea
+              rows={5}
+              value={form.challenge || ""}
+              onChange={(e) => setField("challenge", e.target.value)}
+            />
+          </FormField>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField label="Points">
+              <Select
+                value={form.point || ""}
+                onChange={(e) =>
+                  setField("point", parseInt(e.target.value, 10))
+                }
+                options={CHALLENGE_POINTS}
+                placeholder="Points"
+              />
+            </FormField>
+            <FormField label="Niveau">
+              <Select
+                value={form.level || ""}
+                onChange={(e) => setField("level", e.target.value)}
+                options={CHALLENGE_LEVELS}
+                placeholder="Niveau"
+              />
+            </FormField>
+          </div>
+          <div className="mt-2 flex items-center justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
+              Annuler
+            </Button>
+            <Button type="submit" variant="primary" leftIcon="Save">
+              Enregistrer
+            </Button>
+          </div>
+        </form>
+      </Card>
     </DefaultLayout>
   );
 };

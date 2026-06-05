@@ -1,288 +1,160 @@
-import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { db } from "../../firebase";
-import { ref, update } from "firebase/database";
-import Alert from "../components/Alert/Alert";
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { ref, update } from "firebase/database";
+import { db } from "../../firebase";
+import DefaultLayout from "../layout/DefaultLayout";
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import Alert from "../components/Alert/Alert";
+import { Card, Button, FormField, Input, Textarea, AreaChart } from "../ui";
 
-import ChartLine from "../components/Chart/ChartLine";
+const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+const clicksToSeries = (object, fallbackName) => {
+  if (!object?.clicksByDay) return [{ name: fallbackName, data: [] }];
+  const data = Array.isArray(object.clicksByDay)
+    ? object.clicksByDay.map((d) => d?.data ?? 0)
+    : DAYS.map((day) => object.clicksByDay[day]?.data ?? 0);
+  return [{ name: fallbackName || "Clics", data }];
+};
 
 const UpdateEvent = () => {
-  let { id } = useParams();
+  const { id } = useParams();
   const location = useLocation();
-
-  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
-  const [objectEvent, setObjectEvent] = useState(location.state);
+  const [form, setForm] = useState(location.state || {});
+  const [showAlert, setShowAlert] = useState(false);
 
-  const setEvent = () => {
-    if (objectEvent.title !== "") {
-      update(ref(db, `/Events/${id}`), {
-        ...objectEvent,
-      });
-      setShowAlert(true);
-      setTimeout(() => {
-        navigate(`/dashboard`);
-      }, 2000);
-    } else {
-      alert("Veuillez ajouter une categorie");
-    }
-  };
+  const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const extractDataFromEventClicksByDay = (eventObject) => {
-    if (eventObject && eventObject.clicksByDay) {
-      // Vérifie si clicksByDay est un objet et non null
-      return Object.keys(eventObject.clicksByDay).map(
-        (day) => eventObject.clicksByDay[day].data,
-      );
-    } else {
-      console.error(
-        "clicksByDay is not defined or is not an object:",
-        eventObject,
-      );
-      return []; // Retourne un tableau vide si clicksByDay n'est pas un objet
+  const submit = (e) => {
+    e.preventDefault();
+    if (!form.title) {
+      alert("Le titre est obligatoire");
+      return;
     }
+    update(ref(db, `/Events/${id}`), { ...form });
+    setShowAlert(true);
+    setTimeout(() => navigate("/dashboard"), 2000);
   };
 
   return (
     <DefaultLayout>
-      {showAlert && (
-        <Alert
-          message="Challenge updated successfully"
-          type="success"
-          description="Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry."
-        />
-      )}
-      <Breadcrumb pageName="UPDATE EVENT" />
-      <ChartLine
-        series={[
-          {
-            name: objectEvent.title,
-            data: extractDataFromEventClicksByDay(objectEvent),
-          },
-        ]}
+      <Alert
+        show={showAlert}
+        type="success"
+        message="Événement mis à jour"
+        description="Tu vas être redirigé vers le dashboard."
       />
-      <div className="grid grid-cols-1 gap-9 mt-9">
-        <div className="flex flex-col gap-9">
-          {/* <!-- Contact Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default">
-            <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Update event {id}</h3>
+      <Breadcrumb
+        pageName={`Édition — événement #${id}`}
+        description={form.title}
+      />
+
+      <div className="grid gap-6">
+        <Card padding="lg" radius="xl">
+          <header className="mb-3 flex items-center justify-between">
+            <div>
+              <h3 className="text-title-md font-semibold text-ink">
+                Clics par jour
+              </h3>
+              <p className="text-body-sm text-ink-muted">
+                {form.clicks || 0} clics au total
+              </p>
             </div>
-            <div className="p-6.5">
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Name Event <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectEvent.title}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        title: e.target.value,
-                      });
-                    }}
-                    placeholder="Name Event"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
+          </header>
+          <AreaChart
+            series={clicksToSeries(form, form.title)}
+            categories={DAYS}
+            colors={["#D39E54"]}
+            height={260}
+          />
+        </Card>
 
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Description <span className="text-meta-1">*</span>
-                  </label>
-                  <textarea
-                    value={objectEvent.description}
-                    rows={6}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        description: e.target.value,
-                      });
-                    }}
-                    type="text"
-                    placeholder="Description"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">Link</label>
-                  <input
-                    type="text"
-                    value={objectEvent.link}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        link: e.target.value,
-                      });
-                    }}
-                    placeholder="add link"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link subscriber
-                  </label>
-                  <input
-                    type="text"
-                    value={objectEvent.subscriberDiscountLink}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        subscriberDiscountLink: e.target.value,
-                      });
-                    }}
-                    placeholder="add link subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Text subscriber <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectEvent.subscriberDiscountText}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        subscriberDiscountText: e.target.value,
-                      });
-                    }}
-                    placeholder="add text subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Location <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectEvent.location}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        location: e.target.value,
-                      });
-                    }}
-                    placeholder="add location"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    start date <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={objectEvent.startDate}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        startDate: e.target.value,
-                      });
-                    }}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    end date <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={objectEvent.endDate}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        endDate: e.target.value,
-                      });
-                    }}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link img <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={objectEvent.img}
-                    onChange={(e) => {
-                      setObjectEvent({
-                        ...objectEvent,
-                        img: e.target.value,
-                      });
-                    }}
-                    placeholder="add link img"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Épinglé événement <span className="text-meta-1">*</span>
-                  </label>
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      value={objectEvent.pin}
-                      className="sr-only peer"
-                      onChange={(e) => {
-                        setObjectEvent({
-                          ...objectEvent,
-                          pin: e.target.value,
-                        });
-                      }}
-                    />
-                    <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                      Pin
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setEvent()}
-                className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+        <Card padding="lg" radius="xl" className="max-w-3xl">
+          <form onSubmit={submit} className="flex flex-col gap-5">
+            <FormField label="Nom de l'événement" required>
+              <Input
+                value={form.title || ""}
+                onChange={(e) => setField("title", e.target.value)}
+              />
+            </FormField>
+            <FormField label="Description" required>
+              <Textarea
+                rows={5}
+                value={form.description || ""}
+                onChange={(e) => setField("description", e.target.value)}
+              />
+            </FormField>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FormField label="Lien">
+                <Input
+                  value={form.link || ""}
+                  onChange={(e) => setField("link", e.target.value)}
+                  leftIcon="Link"
+                />
+              </FormField>
+              <FormField label="Lien abonné">
+                <Input
+                  value={form.subscriberDiscountLink || ""}
+                  onChange={(e) =>
+                    setField("subscriberDiscountLink", e.target.value)
+                  }
+                  leftIcon="Link"
+                />
+              </FormField>
+            </div>
+            <FormField label="Texte abonné">
+              <Input
+                value={form.subscriberDiscountText || ""}
+                onChange={(e) =>
+                  setField("subscriberDiscountText", e.target.value)
+                }
+              />
+            </FormField>
+            <FormField label="Lieu">
+              <Input
+                value={form.location || ""}
+                onChange={(e) => setField("location", e.target.value)}
+                leftIcon="MapPin"
+              />
+            </FormField>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FormField label="Date de début">
+                <Input
+                  type="date"
+                  value={form.startDate || ""}
+                  onChange={(e) => setField("startDate", e.target.value)}
+                />
+              </FormField>
+              <FormField label="Date de fin">
+                <Input
+                  type="date"
+                  value={form.endDate || ""}
+                  onChange={(e) => setField("endDate", e.target.value)}
+                />
+              </FormField>
+            </div>
+            <FormField label="URL de l'image">
+              <Input
+                value={form.img || ""}
+                onChange={(e) => setField("img", e.target.value)}
+                leftIcon="Image"
+              />
+            </FormField>
+            <div className="mt-2 flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate(-1)}
               >
-                Update event
-              </button>
+                Annuler
+              </Button>
+              <Button type="submit" variant="primary" leftIcon="Save">
+                Enregistrer
+              </Button>
             </div>
-          </div>
-        </div>
+          </form>
+        </Card>
       </div>
     </DefaultLayout>
   );

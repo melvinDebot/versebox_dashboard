@@ -1,249 +1,157 @@
-import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { db } from "../../firebase";
-import { ref, update } from "firebase/database";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ref, update } from "firebase/database";
+import { db } from "../../firebase";
+import DefaultLayout from "../layout/DefaultLayout";
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import Alert from "../components/Alert/Alert";
 import { useFirebase } from "../context/FirebaseContext";
+import { Card, Button, FormField, Input, Textarea } from "../ui";
+import { EMPTY_CLICKS_BY_DAY } from "../utils/constants";
+
+const initialState = {
+  title: "",
+  description: "",
+  link: "",
+  subscriberDiscountLink: "",
+  subscriberDiscountText: "",
+  location: "",
+  startDate: "",
+  endDate: "",
+  img: "",
+};
 
 const CreateEvent = () => {
-  const [newEvent, setNewEvent] = useState({});
   const { events } = useFirebase();
-
   const navigate = useNavigate();
+  const [form, setForm] = useState(initialState);
+  const [showAlert, setShowAlert] = useState(false);
 
-  const createEventToBdd = () => {
+  const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const submit = (e) => {
+    e.preventDefault();
     if (
-      newEvent.title &&
-      newEvent.description &&
-      newEvent.location &&
-      newEvent.startDate &&
-      newEvent.endDate &&
-      newEvent.img
+      !form.title ||
+      !form.description ||
+      !form.location ||
+      !form.startDate ||
+      !form.endDate ||
+      !form.img
     ) {
-      update(ref(db, `/Events/${events.length}`), {
-        ...newEvent,
-        link: newEvent.link || "",
-        subscriberDiscountLink: newEvent.subscriberDiscountLink || "",
-        subscriberDiscountText: newEvent.subscriberDiscountText || "",
-        clicksByDay: [
-          { day: "Dim", data: 0 },
-          { day: "Lun", data: 0 },
-          { day: "Mar", data: 0 },
-          { day: "Mer", data: 0 },
-          { day: "Jeu", data: 0 },
-          { day: "Ven", data: 0 },
-          { day: "Sam", data: 0 },
-        ],
-        clicks: 0,
-        id: events.length,
-      });
-      alert("Event created successfully!");
-      setTimeout(() => {
-        navigate(`/dashboard`);
-      }, 2000);
-    } else {
-      alert("Veuillez remplir tous les champs");
+      alert("Veuillez remplir tous les champs obligatoires");
+      return;
     }
+    update(ref(db, `/Events/${events.length}`), {
+      ...form,
+      clicksByDay: EMPTY_CLICKS_BY_DAY,
+      clicks: 0,
+      id: events.length,
+    });
+    setShowAlert(true);
+    setTimeout(() => navigate("/dashboard"), 2000);
   };
+
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Create event" />
-      <div className="grid grid-cols-1 gap-9">
-        <div className="flex flex-col gap-9">
-          {/* <!-- Contact Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default">
-            <div className="border-b border-stroke py-4 px-6.5">
-              <h3 className="font-medium text-black ">Create new event</h3>
-            </div>
-            <div className="p-6.5">
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Name Event <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.title}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        title: e.target.value,
-                      });
-                    }}
-                    placeholder="Name Event"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Description <span className="text-meta-1">*</span>
-                  </label>
-                  <textarea
-                    value={newEvent.description}
-                    rows={6}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        description: e.target.value,
-                      });
-                    }}
-                    type="text"
-                    placeholder="Description"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">Link</label>
-                  <input
-                    type="text"
-                    value={newEvent.link}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        link: e.target.value,
-                      });
-                    }}
-                    placeholder="add link"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link subscriber
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.subscriberDiscountLink}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        subscriberDiscountLink: e.target.value,
-                      });
-                    }}
-                    placeholder="add link subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Text subscriber <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.subscriberDiscountText}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        subscriberDiscountText: e.target.value,
-                      });
-                    }}
-                    placeholder="add text subscriber"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Location <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.location}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        location: e.target.value,
-                      });
-                    }}
-                    placeholder="add location"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    start date <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={newEvent.startDate}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        startDate: e.target.value,
-                      });
-                    }}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    end date <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={newEvent.endDate}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        endDate: e.target.value,
-                      });
-                    }}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black ">
-                    Link img <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newEvent.img}
-                    onChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        img: e.target.value,
-                      });
-                    }}
-                    placeholder="add link img"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter "
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={() => createEventToBdd()}
-                className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
-              >
-                Create event
-              </button>
-            </div>
+      <Alert
+        show={showAlert}
+        type="success"
+        message="Événement créé"
+        description="Tu vas être redirigé vers le dashboard."
+      />
+      <Breadcrumb
+        pageName="Nouvel événement"
+        description="Ajoute un événement visible côté application"
+      />
+      <Card padding="lg" radius="xl" className="max-w-3xl">
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <FormField label="Nom de l'événement" required>
+            <Input
+              value={form.title}
+              onChange={(e) => setField("title", e.target.value)}
+              placeholder="Concert gospel"
+            />
+          </FormField>
+          <FormField label="Description" required>
+            <Textarea
+              rows={5}
+              value={form.description}
+              onChange={(e) => setField("description", e.target.value)}
+              placeholder="Décris l'événement"
+            />
+          </FormField>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField label="Lien" hint="URL publique">
+              <Input
+                value={form.link}
+                onChange={(e) => setField("link", e.target.value)}
+                placeholder="https://…"
+                leftIcon="Link"
+              />
+            </FormField>
+            <FormField label="Lien abonné">
+              <Input
+                value={form.subscriberDiscountLink}
+                onChange={(e) =>
+                  setField("subscriberDiscountLink", e.target.value)
+                }
+                placeholder="https://…"
+                leftIcon="Link"
+              />
+            </FormField>
           </div>
-        </div>
-      </div>
+          <FormField label="Texte abonné" required>
+            <Input
+              value={form.subscriberDiscountText}
+              onChange={(e) =>
+                setField("subscriberDiscountText", e.target.value)
+              }
+              placeholder="-20% pour les abonnés"
+            />
+          </FormField>
+          <FormField label="Lieu" required>
+            <Input
+              value={form.location}
+              onChange={(e) => setField("location", e.target.value)}
+              placeholder="Paris, France"
+              leftIcon="MapPin"
+            />
+          </FormField>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField label="Date de début" required>
+              <Input
+                type="date"
+                value={form.startDate}
+                onChange={(e) => setField("startDate", e.target.value)}
+              />
+            </FormField>
+            <FormField label="Date de fin" required>
+              <Input
+                type="date"
+                value={form.endDate}
+                onChange={(e) => setField("endDate", e.target.value)}
+              />
+            </FormField>
+          </div>
+          <FormField label="URL de l'image" required>
+            <Input
+              value={form.img}
+              onChange={(e) => setField("img", e.target.value)}
+              placeholder="https://…"
+              leftIcon="Image"
+            />
+          </FormField>
+          <div className="mt-2 flex items-center justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
+              Annuler
+            </Button>
+            <Button type="submit" variant="primary" leftIcon="Plus">
+              {"Créer l'événement"}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </DefaultLayout>
   );
 };

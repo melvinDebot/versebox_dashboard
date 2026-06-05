@@ -1,80 +1,99 @@
-import { useState, createContext, useEffect, useContext } from "react";
-import { db } from "../../firebase";
-import { onValue, ref } from "firebase/database";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
+import { onValue, ref } from "firebase/database";
+import { db } from "../../firebase";
 
-const FirebaseContext = createContext();
+const FirebaseContext = createContext(null);
 
-export function useFirebase() {
-  return useContext(FirebaseContext);
-}
+// eslint-disable-next-line react-refresh/only-export-components
+export const useFirebase = () => {
+  const ctx = useContext(FirebaseContext);
+  if (!ctx) {
+    throw new Error("useFirebase doit être utilisé à l'intérieur de FirebaseProvider");
+  }
+  return ctx;
+};
 
-export function FirebaseProvider({ children }) {
-  const [events, setEvents] = useState([]);
-  const [store, setStore] = useState([]);
-  const [data, setData] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [dataNavBar, setDataNavBar] = useState([]);
-  const [getListCodes, setGetListCodes] = useState([]);
+const toArray = (snapshotValue) => {
+  if (!snapshotValue) return [];
+  if (Array.isArray(snapshotValue)) return snapshotValue.filter(Boolean);
+  return Object.entries(snapshotValue).map(([id, value]) => ({
+    ...(typeof value === "object" && value !== null ? value : { value }),
+    _id: id,
+  }));
+};
+
+const SOURCES = [
+  { path: "Store/", key: "store", transform: toArray },
+  { path: "Events/", key: "events", transform: toArray },
+  { path: "users/", key: "users", transform: toArray },
+  { path: "RewardCodes/", key: "rewardCodes", transform: toArray },
+  { path: "dataIHM/", key: "challengesByCategory", transform: (v) => v ?? {} },
+  { path: "isActiveGame/", key: "dataNavBar", transform: (v) => v ?? {} },
+];
+
+export const FirebaseProvider = ({ children }) => {
+  const [state, setState] = useState({
+    store: [],
+    events: [],
+    users: [],
+    rewardCodes: [],
+    challengesByCategory: {},
+    dataNavBar: {},
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
-    // Fonction pour récupérer les données de la base de données Firebase
-    const fetchData = async () => {
-      const productRef = ref(db, `Store/`);
-      onValue(productRef, (snapshot) => {
-        const data = snapshot.val();
-        setStore(data);
-      });
+    const unsubscribes = [];
+    const loadingFlags = Object.fromEntries(SOURCES.map((s) => [s.key, true]));
 
-      const EventRef = ref(db, `Events/`);
-      onValue(EventRef, (snapshot) => {
-        const data = snapshot.val();
-        setEvents(data);
-      });
-
-      const getItemsActiveNavBar = ref(db, `isActiveGame/`);
-      onValue(getItemsActiveNavBar, (snapshot) => {
-        const data = snapshot.val();
-        setDataNavBar(data);
-      });
-
-      const DatatRef = ref(db, `dataIHM/`);
-      onValue(DatatRef, (snapshot) => {
-        const data = snapshot.val();
-        setData(data);
-      });
-
-      const UserRef = ref(db, `users/`);
-      onValue(UserRef, (snapshot) => {
-        const data = snapshot.val();
-        setUsers(data);
-      });
-
-      const getListCodesRef = ref(db, `RewardCodes/`);
-      onValue(getListCodesRef, (snapshot) => {
-        const data = snapshot.val();
-        setGetListCodes(data);
-      });
+    const markLoaded = (key) => {
+      loadingFlags[key] = false;
+      if (Object.values(loadingFlags).every((v) => v === false)) {
+        setState((prev) => ({ ...prev, loading: false }));
+      }
     };
 
-    fetchData();
+    SOURCES.forEach(({ path, key, transform }) => {
+      const sourceRef = ref(db, path);
+      const unsubscribe = onValue(
+        sourceRef,
+        (snapshot) => {
+          setState((prev) => ({
+            ...prev,
+            [key]: transform(snapshot.val()),
+          }));
+          markLoaded(key);
+        },
+        (error) => {
+          setState((prev) => ({ ...prev, error }));
+          markLoaded(key);
+        },
+      );
+      unsubscribes.push(unsubscribe);
+    });
+
+    return () => {
+      unsubscribes.forEach((fn) => fn?.());
+    };
   }, []);
 
-  const value = {
-    events,
-    store,
-    data,
-    users,
-    dataNavBar,
-    getListCodes,
-  };
+  const value = useMemo(
+    () => ({
+      ...state,
+      data: state.challengesByCategory,
+      getListCodes: state.rewardCodes,
+    }),
+    [state],
+  );
 
   return (
     <FirebaseContext.Provider value={value}>
       {children}
     </FirebaseContext.Provider>
   );
-}
+};
 
 FirebaseProvider.propTypes = {
   children: PropTypes.node,

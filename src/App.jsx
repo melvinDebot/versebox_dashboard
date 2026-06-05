@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
-import "./App.css";
 
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
@@ -38,11 +37,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="container-loader">
-        <Loading />
-      </div>
-    ); // Afficher un indicateur de chargement pendant que Firebase vérifie l'état de connexion
+    return <Loading />;
   }
 
   //eslint-disable-next-line
