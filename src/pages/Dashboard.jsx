@@ -110,10 +110,15 @@ const Dashboard = () => {
   };
 
   const challengeRows = Object.entries(challengesByCategory || {}).map(
-    ([category, list]) => ({
-      category,
-      total: Array.isArray(list) ? list.length : 0,
-    }),
+    ([category, list]) => {
+      const items = Array.isArray(list) ? list : [];
+      const incomplete = items.filter((c) => !c?.point || !c?.level).length;
+      return {
+        category,
+        total: items.length,
+        incomplete,
+      };
+    },
   );
 
   return (
@@ -372,6 +377,18 @@ const Dashboard = () => {
                       {value} challenges
                     </Badge>
                   ),
+                },
+                {
+                  key: "incomplete",
+                  label: "À compléter",
+                  render: (value) =>
+                    value > 0 ? (
+                      <Badge variant="tertiary" size="md" dot>
+                        {value} restant{value > 1 ? "s" : ""}
+                      </Badge>
+                    ) : (
+                      <span className="text-body-sm text-ink-muted">—</span>
+                    ),
                 },
                 {
                   key: "actions",

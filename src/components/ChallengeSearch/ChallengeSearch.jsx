@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../../context/FirebaseContext";
 import { Badge, Icon } from "../../ui";
+
+const PAGE_SIZE = 30;
 
 const flattenChallenges = (challengesByCategory) => {
   if (!challengesByCategory) return [];
@@ -35,26 +37,59 @@ const matchesTerm = (challenge, term) => {
   );
 };
 
+const interleaveByCategory = (items) => {
+  if (items.length === 0) return [];
+  const groups = new Map();
+  items.forEach((item) => {
+    const key = item._category || "Autres";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  });
+  const ordered = [];
+  let rowIdx = 0;
+  let added = true;
+  while (added) {
+    added = false;
+    groups.forEach((list) => {
+      if (list[rowIdx]) {
+        ordered.push(list[rowIdx]);
+        added = true;
+      }
+    });
+    rowIdx++;
+  }
+  return ordered;
+};
+
 const ChallengeSearch = () => {
   const { challengesByCategory } = useFirebase();
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const listRef = useRef(null);
 
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const allChallenges = useMemo(
     () => flattenChallenges(challengesByCategory),
     [challengesByCategory],
   );
 
-  const results = useMemo(() => {
+  const allMatching = useMemo(() => {
     const term = query.toLowerCase().trim();
     if (!term) return [];
-    return allChallenges.filter((c) => matchesTerm(c, term)).slice(0, 8);
+    return interleaveByCategory(
+      allChallenges.filter((c) => matchesTerm(c, term)),
+    );
   }, [allChallenges, query]);
+
+  const results = useMemo(
+    () => allMatching.slice(0, visibleCount),
+    [allMatching, visibleCount],
+  );
 
   const groupedResults = useMemo(() => {
     return results.reduce((acc, challenge) => {
@@ -64,6 +99,8 @@ const ChallengeSearch = () => {
       return acc;
     }, {});
   }, [results]);
+
+  const hasMore = visibleCount < allMatching.length;
 
   useEffect(() => {
     const handler = (e) => {
@@ -77,6 +114,8 @@ const ChallengeSearch = () => {
 
   useEffect(() => {
     setActiveIndex(0);
+    setVisibleCount(PAGE_SIZE);
+    if (listRef.current) listRef.current.scrollTop = 0;
   }, [query]);
 
   useEffect(() => {
@@ -98,20 +137,45 @@ const ChallengeSearch = () => {
     setQuery("");
   };
 
+  const scrollActiveIntoView = useCallback((index) => {
+    if (!listRef.current) return;
+    const node = listRef.current.querySelector(`[data-result-index="${index}"]`);
+    if (node && typeof node.scrollIntoView === "function") {
+      node.scrollIntoView({ block: "nearest" });
+    }
+  }, []);
+
   const handleKeyDown = (e) => {
     if (!open || results.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
+      const next = Math.min(activeIndex + 1, results.length - 1);
+      setActiveIndex(next);
+      scrollActiveIntoView(next);
+      if (next >= results.length - 5 && hasMore) {
+        setVisibleCount((c) => Math.min(c + PAGE_SIZE, allMatching.length));
+      }
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
+      const next = Math.max(activeIndex - 1, 0);
+      setActiveIndex(next);
+      scrollActiveIntoView(next);
     } else if (e.key === "Enter") {
       e.preventDefault();
       goTo(results[activeIndex]);
     } else if (e.key === "Escape") {
       setOpen(false);
       inputRef.current?.blur();
+    }
+  };
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (
+      hasMore &&
+      scrollHeight - scrollTop - clientHeight < 160
+    ) {
+      setVisibleCount((c) => Math.min(c + PAGE_SIZE, allMatching.length));
     }
   };
 
@@ -162,7 +226,7 @@ const ChallengeSearch = () => {
       </div>
 
       {open && query && (
-        <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-[480px] overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-lifted dark:border-secondary-500 dark:bg-secondary-700">
+        <div className="absolute left-0 right-0 top-full z-30 mt-2 rounded-2xl border border-neutral-200 bg-white shadow-lifted dark:border-secondary-500 dark:bg-secondary-700">
           {results.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
               <Icon name="SearchX" size="lg" className="text-ink-muted" />
@@ -174,11 +238,18 @@ const ChallengeSearch = () => {
               </p>
             </div>
           ) : (
-            <div className="py-2">
+            <div
+              ref={listRef}
+              onScroll={handleScroll}
+              className="max-h-[480px] overflow-y-auto py-2 scrollbar-thin"
+            >
               {Object.entries(groupedResults).map(([category, items]) => (
                 <div key={category} className="px-2 py-1">
-                  <p className="px-3 pb-1.5 pt-2 text-caption font-semibold uppercase tracking-wide text-ink-muted">
+                  <p className="sticky top-0 z-10 -mx-2 bg-white/95 px-5 pb-1.5 pt-2 text-caption font-semibold uppercase tracking-wide text-ink-muted backdrop-blur-sm dark:bg-secondary-700/95">
                     {category}
+                    <span className="ml-2 font-normal normal-case tracking-normal text-ink-muted">
+                      · {items.length}
+                    </span>
                   </p>
                   <ul className="flex flex-col">
                     {items.map((c) => {
@@ -188,6 +259,7 @@ const ChallengeSearch = () => {
                         <li key={`${c._category}-${c._index}`}>
                           <button
                             type="button"
+                            data-result-index={flatIndex}
                             onMouseEnter={() => setActiveIndex(flatIndex)}
                             onClick={() => goTo(c)}
                             className={`flex w-full items-start justify-between gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
@@ -226,6 +298,16 @@ const ChallengeSearch = () => {
                   </ul>
                 </div>
               ))}
+              {hasMore && (
+                <div className="flex items-center justify-center gap-2 px-3 py-3 text-caption text-ink-muted">
+                  <Icon
+                    name="Loader2"
+                    size="xs"
+                    className="animate-spin"
+                  />
+                  Chargement de plus de résultats…
+                </div>
+              )}
             </div>
           )}
           <div className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 px-4 py-2.5 text-caption text-ink-muted dark:border-secondary-500 dark:bg-secondary-800">
@@ -249,7 +331,10 @@ const ChallengeSearch = () => {
                 Fermer
               </span>
             </div>
-            <span>{results.length} résultat{results.length > 1 ? "s" : ""}</span>
+            <span>
+              {results.length} sur {allMatching.length} résultat
+              {allMatching.length > 1 ? "s" : ""}
+            </span>
           </div>
         </div>
       )}
