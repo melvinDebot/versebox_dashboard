@@ -26,11 +26,13 @@ const CreateEvent = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialState);
   const [showAlert, setShowAlert] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const submit = (e) => {
     e.preventDefault();
+    if (submitting) return;
     if (
       !form.title ||
       !form.description ||
@@ -42,6 +44,7 @@ const CreateEvent = () => {
       alert("Veuillez remplir tous les champs obligatoires");
       return;
     }
+    setSubmitting(true);
     update(ref(db, `/Events/${events.length}`), {
       ...form,
       clicksByDay: EMPTY_CLICKS_BY_DAY,
@@ -146,8 +149,13 @@ const CreateEvent = () => {
             <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
               Annuler
             </Button>
-            <Button type="submit" variant="primary" leftIcon="Plus">
-              {"Créer l'événement"}
+            <Button
+              type="submit"
+              variant="primary"
+              leftIcon="Plus"
+              loading={submitting}
+            >
+              {submitting ? "Création…" : "Créer l'événement"}
             </Button>
           </div>
         </form>

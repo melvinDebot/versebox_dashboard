@@ -4,7 +4,7 @@ export const CHALLENGE_CATEGORIES = [
   { value: "finances", label: "Finances" },
   { value: "mental", label: "Mental", disabled: true },
   { value: "motivation", label: "Motivation", disabled: true },
-  { value: "organisation", label: "Organisation" },
+  { value: "organisation", label: "Organisation", disabled: true },
   { value: "relationel", label: "Relationnel", disabled: true },
   { value: "santé", label: "Santé" },
   { value: "spiritualité", label: "Spiritualité", disabled: true },

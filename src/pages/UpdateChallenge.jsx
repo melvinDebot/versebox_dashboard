@@ -35,6 +35,7 @@ const UpdateChallenge = () => {
   const initial = location.state || {};
   const [form, setForm] = useState(initial);
   const [showAlert, setShowAlert] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const { pathCategory, fieldCategory } = resolveCategory(initial);
 
@@ -43,10 +44,12 @@ const UpdateChallenge = () => {
 
   const submit = (e) => {
     e.preventDefault();
+    if (submitting) return;
     if (!pathCategory) {
       alert("Catégorie introuvable pour ce challenge");
       return;
     }
+    setSubmitting(true);
     update(ref(db, `/dataIHM/${pathCategory}/${id}/`), {
       ...form,
       categories: [fieldCategory],
@@ -141,8 +144,13 @@ const UpdateChallenge = () => {
             <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
               Annuler
             </Button>
-            <Button type="submit" variant="primary" leftIcon="Save">
-              Enregistrer
+            <Button
+              type="submit"
+              variant="primary"
+              leftIcon="Save"
+              loading={submitting}
+            >
+              {submitting ? "Enregistrement…" : "Enregistrer"}
             </Button>
           </div>
         </form>

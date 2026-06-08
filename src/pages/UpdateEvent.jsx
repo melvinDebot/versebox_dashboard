@@ -23,15 +23,18 @@ const UpdateEvent = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState(location.state || {});
   const [showAlert, setShowAlert] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const submit = (e) => {
     e.preventDefault();
+    if (submitting) return;
     if (!form.title) {
       alert("Le titre est obligatoire");
       return;
     }
+    setSubmitting(true);
     update(ref(db, `/Events/${id}`), { ...form });
     setShowAlert(true);
     setTimeout(() => navigate("/dashboard"), 2000);
@@ -149,8 +152,13 @@ const UpdateEvent = () => {
               >
                 Annuler
               </Button>
-              <Button type="submit" variant="primary" leftIcon="Save">
-                Enregistrer
+              <Button
+                type="submit"
+                variant="primary"
+                leftIcon="Save"
+                loading={submitting}
+              >
+                {submitting ? "Enregistrement…" : "Enregistrer"}
               </Button>
             </div>
           </form>

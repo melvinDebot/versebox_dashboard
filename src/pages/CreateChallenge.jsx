@@ -28,11 +28,13 @@ const CreateChallenge = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialState);
   const [showAlert, setShowAlert] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const submit = (e) => {
     e.preventDefault();
+    if (submitting) return;
     const category = form.categories[0];
     if (
       !form.verse ||
@@ -46,6 +48,7 @@ const CreateChallenge = () => {
       alert("Veuillez remplir tous les champs");
       return;
     }
+    setSubmitting(true);
     const categoryList = challengesByCategory[category];
     const nextIndex = Array.isArray(categoryList) ? categoryList.length : 0;
     update(ref(db, `/dataIHM/${category}/${nextIndex}/`), {
@@ -139,8 +142,13 @@ const CreateChallenge = () => {
             >
               Annuler
             </Button>
-            <Button type="submit" variant="primary" leftIcon="Plus">
-              Créer le challenge
+            <Button
+              type="submit"
+              variant="primary"
+              leftIcon="Plus"
+              loading={submitting}
+            >
+              {submitting ? "Création…" : "Créer le challenge"}
             </Button>
           </div>
         </form>
