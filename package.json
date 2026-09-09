@@ -9,7 +9,8 @@
     "format": "prettier --write src/",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "delete-ds-store": "find . -name '._*' -delete && find . -name '.DS_Store' -delete",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "rotate-rules": "node scripts/rotate-rules.mjs"
   },
   "dependencies": {
     "apexcharts": "^4.7.0",

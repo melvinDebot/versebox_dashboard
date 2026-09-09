@@ -5,6 +5,7 @@ import { db } from "../../firebase";
 import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import ChallengeSearch from "../components/ChallengeSearch/ChallengeSearch";
+import RulesDeadlineBanner from "../components/RulesDeadlineBanner/RulesDeadlineBanner";
 import {
   Card,
   Button,
@@ -124,6 +125,8 @@ const Dashboard = () => {
   return (
     <DefaultLayout>
       <div className="flex flex-col gap-6">
+        <RulesDeadlineBanner />
+
         <ChallengeSearch />
 
         <section className="grid gap-4 lg:grid-cols-3">
