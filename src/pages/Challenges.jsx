@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { onValue, ref } from "firebase/database";
+import { db } from "../../firebase";
 import DefaultLayout from "../layout/DefaultLayout";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import { useFirebase } from "../context/FirebaseContext";
@@ -7,10 +9,38 @@ import { Card, DataTable, Button, Badge, Icon } from "../ui";
 
 const isIncomplete = (challenge) => !challenge?.point || !challenge?.level;
 
+const LANGUAGES = [
+  { value: "fr", label: "Français" },
+  { value: "en", label: "English" },
+];
+
+// Les challenges anglais ne sont chargés qu'à la demande, catégorie par catégorie
+const useEnglishChallenges = (category, enabled) => {
+  const [state, setState] = useState({ list: [], loading: enabled });
+
+  useEffect(() => {
+    if (!enabled || !category) return undefined;
+    setState({ list: [], loading: true });
+    return onValue(
+      ref(db, `dataIHMEn/${category}`),
+      (snapshot) => {
+        const value = snapshot.val();
+        setState({ list: Array.isArray(value) ? value : [], loading: false });
+      },
+      () => setState({ list: [], loading: false }),
+    );
+  }, [category, enabled]);
+
+  return state;
+};
+
 const Challenges = () => {
   const { challengesByCategory, loading } = useFirebase();
   const { category } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lang = searchParams.get("lang") === "en" ? "en" : "fr";
+  const english = useEnglishChallenges(category, lang === "en");
 
   const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
 
@@ -19,13 +49,17 @@ const Challenges = () => {
     setShowOnlyIncomplete(false);
   }, [category]);
 
-  const list = useMemo(
-    () =>
-      Array.isArray(challengesByCategory?.[category])
-        ? challengesByCategory[category]
-        : [],
-    [challengesByCategory, category],
-  );
+  const list = useMemo(() => {
+    if (lang === "en") return english.list;
+    return Array.isArray(challengesByCategory?.[category])
+      ? challengesByCategory[category]
+      : [];
+  }, [challengesByCategory, category, lang, english.list]);
+
+  const isLoading = lang === "en" ? english.loading : loading;
+
+  const setLang = (next) =>
+    setSearchParams(next === "en" ? { lang: "en" } : {}, { replace: true });
 
   const enrichedList = useMemo(
     () => list.map((item, idx) => ({ ...item, _index: idx })),
@@ -62,7 +96,7 @@ const Challenges = () => {
         <DataTable
           rows={rows}
           rowKey={(row) => row._index}
-          loading={loading}
+          loading={isLoading}
           searchKeys="*"
           searchPlaceholder="Rechercher (verset, contenu, challenge, niveau…)"
           emptyTitle={
@@ -77,28 +111,63 @@ const Challenges = () => {
           }
           emptyIcon={showOnlyIncomplete ? "CircleCheck" : "Sparkles"}
           toolbar={
-            <button
-              type="button"
-              onClick={() => setShowOnlyIncomplete((v) => !v)}
-              className={`inline-flex items-center gap-2 rounded-pill px-4 h-11 text-body-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
-                showOnlyIncomplete
-                  ? "bg-tertiary-500 text-white hover:bg-tertiary-700"
-                  : "border border-neutral-200 bg-white text-ink hover:bg-neutral-100 dark:border-secondary-500 dark:bg-secondary-700 dark:text-white dark:hover:bg-secondary-600"
-              }`}
-              aria-pressed={showOnlyIncomplete}
-            >
-              <Icon name={showOnlyIncomplete ? "FilterX" : "Filter"} size="sm" />
-              À compléter
-              <Badge
-                variant={showOnlyIncomplete ? "solid" : "tertiary"}
-                size="sm"
-                className={
-                  showOnlyIncomplete ? "bg-white/20 text-white" : undefined
-                }
+            <>
+              <div
+                role="radiogroup"
+                aria-label="Langue des challenges"
+                className="inline-flex h-11 items-center gap-1 rounded-pill border border-neutral-200 bg-white p-1 dark:border-secondary-500 dark:bg-secondary-700"
               >
-                {incompleteCount}
-              </Badge>
-            </button>
+                <Icon
+                  name="Languages"
+                  size="sm"
+                  className="ml-2 mr-1 text-ink-muted"
+                />
+                {LANGUAGES.map((option) => {
+                  const active = lang === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setLang(option.value)}
+                      className={`h-full rounded-pill px-3.5 text-body-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
+                        active
+                          ? "bg-secondary-900 text-white dark:bg-neutral-50 dark:text-secondary-900"
+                          : "text-ink-muted hover:text-ink"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowOnlyIncomplete((v) => !v)}
+                className={`inline-flex items-center gap-2 rounded-pill px-4 h-11 text-body-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
+                  showOnlyIncomplete
+                    ? "bg-tertiary-500 text-white hover:bg-tertiary-700"
+                    : "border border-neutral-200 bg-white text-ink hover:bg-neutral-100 dark:border-secondary-500 dark:bg-secondary-700 dark:text-white dark:hover:bg-secondary-600"
+                }`}
+                aria-pressed={showOnlyIncomplete}
+              >
+                <Icon
+                  name={showOnlyIncomplete ? "FilterX" : "Filter"}
+                  size="sm"
+                />
+                À compléter
+                <Badge
+                  variant={showOnlyIncomplete ? "solid" : "tertiary"}
+                  size="sm"
+                  className={
+                    showOnlyIncomplete ? "bg-white/20 text-white" : undefined
+                  }
+                >
+                  {incompleteCount}
+                </Badge>
+              </button>
+            </>
           }
           columns={[
             {
@@ -149,7 +218,7 @@ const Challenges = () => {
                   leftIcon="Pencil"
                   onClick={() =>
                     navigate(`/update-challenge/${row._index}`, {
-                      state: { ...row, _pathCategory: category },
+                      state: { ...row, _pathCategory: category, _lang: lang },
                     })
                   }
                 >

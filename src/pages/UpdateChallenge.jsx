@@ -28,6 +28,17 @@ const resolveCategory = (state) => {
   return { pathCategory, fieldCategory: persistedField };
 };
 
+const LANG_CONFIG = {
+  fr: { root: "dataIHM", label: "Français", badge: "FR" },
+  en: { root: "dataIHMEn", label: "Anglais", badge: "EN" },
+};
+
+// Retire les champs techniques (_index, _pathCategory, _lang…) avant écriture
+const withoutInternalKeys = (data) =>
+  Object.fromEntries(
+    Object.entries(data).filter(([key]) => !key.startsWith("_")),
+  );
+
 const UpdateChallenge = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -38,6 +49,8 @@ const UpdateChallenge = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const { pathCategory, fieldCategory } = resolveCategory(initial);
+  const lang = initial._lang === "en" ? "en" : "fr";
+  const langConfig = LANG_CONFIG[lang];
 
   const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -50,14 +63,20 @@ const UpdateChallenge = () => {
       return;
     }
     setSubmitting(true);
-    update(ref(db, `/dataIHM/${pathCategory}/${id}/`), {
-      ...form,
+    update(ref(db, `/${langConfig.root}/${pathCategory}/${id}/`), {
+      ...withoutInternalKeys(form),
       categories: [fieldCategory],
       like: form.like || 0,
       unlike: form.unlike || 0,
     });
     setShowAlert(true);
-    setTimeout(() => navigate(`/tables-challenges/${pathCategory}`), 1500);
+    setTimeout(
+      () =>
+        navigate(
+          `/tables-challenges/${pathCategory}${lang === "en" ? "?lang=en" : ""}`,
+        ),
+      1500,
+    );
   };
 
   return (
@@ -70,7 +89,11 @@ const UpdateChallenge = () => {
       />
       <Breadcrumb
         pageName={`Édition — challenge #${id}`}
-        description={fieldCategory ? `Catégorie : ${fieldCategory}` : undefined}
+        description={
+          fieldCategory
+            ? `Catégorie : ${fieldCategory} · Version ${langConfig.label.toLowerCase()}`
+            : undefined
+        }
       />
 
       <Card padding="lg" radius="xl" className="max-w-3xl">
@@ -86,6 +109,10 @@ const UpdateChallenge = () => {
               {fieldCategory || "—"}
             </p>
           </div>
+          <Badge variant={lang === "en" ? "tertiary" : "primary"} size="md">
+            <Icon name="Languages" size="xs" />
+            {langConfig.badge}
+          </Badge>
           <Badge variant="neutral" size="sm">
             <Icon name="Lock" size="xs" />
             Non modifiable
