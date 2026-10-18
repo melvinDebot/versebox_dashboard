@@ -1,63 +1,38 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import { ref, update } from "firebase/database";
+import { ref, remove, update } from "firebase/database";
 import { db } from "../../../firebase";
-import { Badge, Button, FormField, Input, Toggle } from "../../ui";
+import { Badge, Button, ConfirmDialog, Toggle } from "../../ui";
+import PromoCodeForm from "../PromoCodeForm/PromoCodeForm";
 import { formatPromoDate, getPromoStatus } from "../../utils/promoCodes";
-
-const validate = ({ points, startsAt, endsAt }) => {
-  const value = Number(points);
-  if (!Number.isInteger(value) || value <= 0) {
-    return "Le nombre de points doit être un entier positif.";
-  }
-  if (!startsAt || !endsAt) return "Les deux dates sont obligatoires.";
-  if (endsAt < startsAt) {
-    return "La date de fin doit être après la date de début.";
-  }
-  return null;
-};
 
 const PromoCodeItem = ({ code }) => {
   const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-  const [form, setForm] = useState({});
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   const codeRef = ref(db, `promoCodes/${code._id}`);
   const status = getPromoStatus(code);
   const isActive = code.isActive !== false;
 
-  const startEditing = () => {
-    setForm({
-      points: code.points ?? "",
-      startsAt: code.startsAt ?? "",
-      endsAt: code.endsAt ?? "",
-    });
-    setError(null);
-    setEditing(true);
+  const handleSave = async ({ points, startsAt, endsAt }) => {
+    await update(codeRef, { points, startsAt, endsAt });
+    setEditing(false);
   };
 
-  const setField = (field) => (event) =>
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+  const closeDeleteDialog = useCallback(() => {
+    setConfirmingDelete(false);
+    setDeleteError(null);
+  }, []);
 
-  const handleSave = async () => {
-    const validationError = validate(form);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    setSaving(true);
+  const handleDelete = async () => {
+    setDeleting(true);
     try {
-      await update(codeRef, {
-        points: Number(form.points),
-        startsAt: form.startsAt,
-        endsAt: form.endsAt,
-      });
-      setEditing(false);
+      await remove(codeRef);
     } catch (e) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
+      setDeleteError(e.message);
+      setDeleting(false);
     }
   };
 
@@ -83,69 +58,61 @@ const PromoCodeItem = ({ code }) => {
             onChange={(checked) => update(codeRef, { isActive: checked })}
           />
           {!editing && (
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon="Pencil"
-              onClick={startEditing}
-            >
-              Modifier
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon="Pencil"
+                onClick={() => setEditing(true)}
+              >
+                Modifier
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                iconOnly
+                leftIcon="Trash2"
+                onClick={() => setConfirmingDelete(true)}
+                aria-label={`Supprimer le code ${code._id}`}
+                title="Supprimer"
+                className="text-error-700 hover:bg-error-50 dark:text-error-300 dark:hover:bg-error-900/30"
+              />
+            </div>
           )}
         </div>
       </div>
 
       {editing && (
-        <div className="flex flex-col gap-3 border-t border-neutral-200 pt-3 dark:border-secondary-600">
-          <div className="grid gap-3 sm:grid-cols-4">
-            <FormField label="Nom" hint="Non modifiable">
-              <Input value={code._id} disabled />
-            </FormField>
-            <FormField label="Points" required>
-              <Input
-                type="number"
-                min={1}
-                value={form.points}
-                onChange={setField("points")}
-              />
-            </FormField>
-            <FormField label="Début" required>
-              <Input
-                type="date"
-                value={form.startsAt}
-                onChange={setField("startsAt")}
-              />
-            </FormField>
-            <FormField label="Fin" required>
-              <Input
-                type="date"
-                value={form.endsAt}
-                onChange={setField("endsAt")}
-              />
-            </FormField>
-          </div>
-          {error && <p className="text-caption text-error-700">{error}</p>}
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setEditing(false)}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon="Check"
-              onClick={handleSave}
-              loading={saving}
-            >
-              Enregistrer
-            </Button>
-          </div>
+        <div className="border-t border-neutral-200 pt-3 dark:border-secondary-600">
+          <PromoCodeForm
+            initialValues={{ ...code, name: code._id }}
+            onSubmit={handleSave}
+            onCancel={() => setEditing(false)}
+          />
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmingDelete}
+        title={`Supprimer le code ${code._id} ?`}
+        description={
+          <>
+            <p>
+              Le code ne pourra plus être utilisé dans l&apos;application. Cette
+              action est définitive.
+            </p>
+            {deleteError && (
+              <p role="alert" className="mt-2 text-caption text-error-700">
+                {deleteError}
+              </p>
+            )}
+          </>
+        }
+        confirmLabel="Supprimer"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={closeDeleteDialog}
+      />
     </li>
   );
 };

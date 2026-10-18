@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ref, update } from "firebase/database";
+import { ref, runTransaction, update } from "firebase/database";
 import PropTypes from "prop-types";
 import { db } from "../../firebase";
 import DefaultLayout from "../layout/DefaultLayout";
@@ -8,6 +8,7 @@ import { useFirebase } from "../context/FirebaseContext";
 import ChallengeSearch from "../components/ChallengeSearch/ChallengeSearch";
 import RulesDeadlineBanner from "../components/RulesDeadlineBanner/RulesDeadlineBanner";
 import PromoCodeItem from "../components/PromoCodeItem/PromoCodeItem";
+import PromoCodeForm from "../components/PromoCodeForm/PromoCodeForm";
 import {
   Card,
   Button,
@@ -18,6 +19,7 @@ import {
   DonutChart,
   BarChart,
   DataTable,
+  EmptyState,
   ProgressBar,
 } from "../ui";
 import { CHALLENGES_PER_CATEGORY_TARGET } from "../utils/constants";
@@ -139,6 +141,17 @@ const Dashboard = () => {
   } = firebase;
   const navigate = useNavigate();
   const { hash } = useLocation();
+  const [creatingPromo, setCreatingPromo] = useState(false);
+
+  const createPromoCode = async ({ name, points, startsAt, endsAt }) => {
+    const { committed } = await runTransaction(
+      ref(db, `promoCodes/${name}`),
+      (current) =>
+        current === null ? { points, startsAt, endsAt, isActive: true } : undefined,
+    );
+    if (!committed) throw new Error("Ce code existe déjà.");
+    setCreatingPromo(false);
+  };
 
   useEffect(() => {
     if (!hash || loading) return;
@@ -313,18 +326,54 @@ const Dashboard = () => {
             radius="xl"
             className="lg:col-span-2 scroll-mt-24"
           >
-            <header className="mb-3 flex items-center justify-between">
+            <header className="mb-3 flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-title-md font-semibold text-ink">
                   Codes promo
                 </h3>
                 <p className="text-body-sm text-ink-muted">
-                  Active, désactive ou modifie les points et les dates. Le nom
-                  ne peut pas être changé.
+                  Ajoute, active, modifie ou supprime un code. Le nom ne peut
+                  plus être changé après création.
                 </p>
               </div>
-              <Badge variant="primary">{getListCodes.length}</Badge>
+              <div className="flex shrink-0 items-center gap-2">
+                <Badge variant="primary">{getListCodes.length}</Badge>
+                {!creatingPromo && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon="Plus"
+                    onClick={() => setCreatingPromo(true)}
+                  >
+                    Ajouter
+                  </Button>
+                )}
+              </div>
             </header>
+            {creatingPromo && (
+              <div className="mb-3 rounded-xl border border-primary-200 bg-primary-50/40 p-4 dark:border-primary-900/60 dark:bg-primary-900/10">
+                <p className="mb-3 text-body-md font-semibold text-ink">
+                  Nouveau code promo
+                </p>
+                <PromoCodeForm
+                  initialValues={{
+                    startsAt: new Date().toLocaleDateString("sv-SE"),
+                  }}
+                  nameEditable
+                  existingNames={getListCodes.map((code) => code._id)}
+                  submitLabel="Créer le code"
+                  onSubmit={createPromoCode}
+                  onCancel={() => setCreatingPromo(false)}
+                />
+              </div>
+            )}
+            {!loading && getListCodes.length === 0 && !creatingPromo && (
+              <EmptyState
+                icon="TicketPercent"
+                title="Aucun code promo"
+                description="Clique sur « Ajouter » pour créer ton premier code."
+              />
+            )}
             <ul className="flex flex-col gap-2.5 max-h-96 overflow-y-auto scrollbar-thin pr-1">
               {loading
                 ? Array.from({ length: 4 }).map((_, i) => (

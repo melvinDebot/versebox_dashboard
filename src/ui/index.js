@@ -15,3 +15,4 @@ export { default as Textarea } from "./Textarea";
 export { default as Select } from "./Select";
 export { default as FormField } from "./FormField";
 export { default as ProgressBar } from "./ProgressBar";
+export { default as ConfirmDialog } from "./ConfirmDialog";
