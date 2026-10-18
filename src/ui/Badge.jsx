@@ -33,7 +33,7 @@ const Badge = ({
   children,
 }) => {
   const classes = [
-    "inline-flex items-center gap-1.5 font-medium rounded-pill",
+    "inline-flex items-center gap-1.5 whitespace-nowrap font-medium rounded-pill",
     VARIANTS[variant],
     SIZES[size],
     className,

@@ -27,9 +27,9 @@ const SOURCES = [
   { path: "Store/", key: "store", transform: toArray },
   { path: "Events/", key: "events", transform: toArray },
   { path: "users/", key: "users", transform: toArray },
-  { path: "RewardCodes/", key: "rewardCodes", transform: toArray },
+  { path: "promoCodes/", key: "promoCodes", transform: toArray },
+  { path: "featuresFlag/", key: "featuresFlag", transform: (v) => v ?? {} },
   { path: "dataIHM/", key: "challengesByCategory", transform: (v) => v ?? {} },
-  { path: "isActiveGame/", key: "dataNavBar", transform: (v) => v ?? {} },
 ];
 
 export const FirebaseProvider = ({ children }) => {
@@ -37,9 +37,9 @@ export const FirebaseProvider = ({ children }) => {
     store: [],
     events: [],
     users: [],
-    rewardCodes: [],
+    promoCodes: [],
+    featuresFlag: {},
     challengesByCategory: {},
-    dataNavBar: {},
     loading: true,
     error: null,
   });
@@ -83,7 +83,7 @@ export const FirebaseProvider = ({ children }) => {
     () => ({
       ...state,
       data: state.challengesByCategory,
-      getListCodes: state.rewardCodes,
+      getListCodes: state.promoCodes,
     }),
     [state],
   );

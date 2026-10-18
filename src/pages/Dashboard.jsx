@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ref, update } from "firebase/database";
 import PropTypes from "prop-types";
 import { db } from "../../firebase";
@@ -6,6 +7,7 @@ import DefaultLayout from "../layout/DefaultLayout";
 import { useFirebase } from "../context/FirebaseContext";
 import ChallengeSearch from "../components/ChallengeSearch/ChallengeSearch";
 import RulesDeadlineBanner from "../components/RulesDeadlineBanner/RulesDeadlineBanner";
+import PromoCodeItem from "../components/PromoCodeItem/PromoCodeItem";
 import {
   Card,
   Button,
@@ -16,12 +18,15 @@ import {
   DonutChart,
   BarChart,
   DataTable,
+  ProgressBar,
 } from "../ui";
+import { CHALLENGES_PER_CATEGORY_TARGET } from "../utils/constants";
 import {
   countUsersByCategory,
   countGenders,
   calculateAgeRanges,
   totalChallenges,
+  progressPercent,
   CATEGORY_LABELS,
   GENDER_LABELS,
   AGE_LABELS,
@@ -41,6 +46,9 @@ const STAT_CARDS = [
     icon: "Sparkles",
     accent: "tertiary",
     pickValue: ({ challengesByCategory }) => totalChallenges(challengesByCategory),
+    pickTarget: ({ challengesByCategory }) =>
+      Object.keys(challengesByCategory || {}).length *
+      CHALLENGES_PER_CATEGORY_TARGET,
   },
   {
     key: "store",
@@ -69,7 +77,7 @@ const ACCENT_STYLES = {
     "bg-warning-50 text-warning-900 dark:bg-warning-900/30 dark:text-warning-200",
 };
 
-const StatCard = ({ title, icon, accent, value, loading }) => (
+const StatCard = ({ title, icon, accent, value, target, loading }) => (
   <Card padding="lg" radius="xl" className="flex flex-col gap-5">
     <div className="flex items-start justify-between">
       <div
@@ -88,6 +96,25 @@ const StatCard = ({ title, icon, accent, value, loading }) => (
         <p className="text-display-md font-semibold text-ink">{value}</p>
       )}
       <p className="mt-1 text-body-sm text-ink-muted">{title}</p>
+      {target > 0 && (
+        <div className="mt-4 flex flex-col gap-1.5">
+          {loading ? (
+            <Skeleton height={8} shape="pill" />
+          ) : (
+            <ProgressBar
+              value={progressPercent(value, target)}
+              tone={accent === "tertiary" ? "tertiary" : "primary"}
+              label={`${title} : progression vers l'objectif`}
+            />
+          )}
+          <p className="flex items-center justify-between gap-2 whitespace-nowrap text-caption text-ink-muted">
+            <span>{`Objectif\u00a0${target}`}</span>
+            <span className="font-semibold text-ink">
+              {loading ? "—" : `${progressPercent(value, target)}\u00a0%`}
+            </span>
+          </p>
+        </div>
+      )}
     </div>
   </Card>
 );
@@ -97,27 +124,51 @@ StatCard.propTypes = {
   icon: PropTypes.string.isRequired,
   accent: PropTypes.oneOf(Object.keys(ACCENT_STYLES)).isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  target: PropTypes.number,
   loading: PropTypes.bool,
 };
 
 const Dashboard = () => {
   const firebase = useFirebase();
-  const { users, dataNavBar, getListCodes, challengesByCategory, loading } =
-    firebase;
+  const {
+    users,
+    featuresFlag,
+    getListCodes,
+    challengesByCategory,
+    loading,
+  } = firebase;
   const navigate = useNavigate();
+  const { hash } = useLocation();
 
-  const updateNavBar = (patch) => {
-    update(ref(db, "isActiveGame"), patch);
+  useEffect(() => {
+    if (!hash || loading) return;
+    document
+      .getElementById(hash.slice(1))
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash, loading]);
+
+  const updateFeaturesFlag = (patch) => {
+    update(ref(db, "featuresFlag"), patch);
   };
+
+  const flags = [
+    {
+      key: "promoCodes",
+      label: "Codes promo",
+      description: "Saisie des codes promo",
+      checked: Boolean(featuresFlag?.promoCodes),
+      onChange: (checked) => updateFeaturesFlag({ promoCodes: checked }),
+    },
+  ];
+  const activeFlags = flags.filter((flag) => flag.checked).length;
 
   const challengeRows = Object.entries(challengesByCategory || {}).map(
     ([category, list]) => {
-      const items = Array.isArray(list) ? list : [];
-      const incomplete = items.filter((c) => !c?.point || !c?.level).length;
+      const total = Array.isArray(list) ? list.length : 0;
       return {
         category,
-        total: items.length,
-        incomplete,
+        total,
+        progress: progressPercent(total, CHALLENGES_PER_CATEGORY_TARGET),
       };
     },
   );
@@ -220,56 +271,61 @@ const Dashboard = () => {
               icon={card.icon}
               accent={card.accent}
               value={card.pickValue(firebase)}
+              target={card.pickTarget?.(firebase)}
               loading={loading}
             />
           ))}
         </section>
 
         <section className="grid gap-4 lg:grid-cols-3">
-          <Card padding="lg" radius="xl" className="lg:col-span-2">
-            <header className="mb-2 flex items-center justify-between">
+          <Card padding="lg" radius="xl">
+            <header className="mb-2 flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-title-md font-semibold text-ink">
-                  Game in the app
+                  Feature flags
                 </h3>
                 <p className="text-body-sm text-ink-muted">
-                  Active ou désactive le jeu côté application mobile
+                  Active ou désactive les fonctionnalités de l&apos;application
+                  mobile en temps réel
                 </p>
               </div>
-              <Badge variant={dataNavBar?.isActivated ? "success" : "neutral"} dot>
-                {dataNavBar?.isActivated ? "Actif" : "Inactif"}
+              <Badge variant={activeFlags > 0 ? "success" : "neutral"} dot>
+                {activeFlags}/{flags.length} actifs
               </Badge>
             </header>
-            <div className="mt-5 grid gap-4 sm:grid-cols-3">
-              <Toggle
-                label="Jeu activé"
-                description="Affichage global"
-                checked={Boolean(dataNavBar?.isActivated)}
-                onChange={(checked) => updateNavBar({ isActivated: checked })}
-              />
-              <Toggle
-                label="Onglet Events"
-                description="Visible en navbar"
-                checked={Boolean(dataNavBar?.isActiveEvent)}
-                onChange={(checked) => updateNavBar({ isActiveEvent: checked })}
-              />
-              <Toggle
-                label="Onglet Boutique"
-                description="Visible en navbar"
-                checked={Boolean(dataNavBar?.isActiveStore)}
-                onChange={(checked) => updateNavBar({ isActiveStore: checked })}
-              />
+            <div className="mt-5 grid gap-4">
+              {flags.map((flag) => (
+                <Toggle
+                  key={flag.key}
+                  id={`feature-flag-${flag.key}`}
+                  label={flag.label}
+                  description={flag.description}
+                  checked={flag.checked}
+                  onChange={flag.onChange}
+                />
+              ))}
             </div>
           </Card>
 
-          <Card padding="lg" radius="xl">
+          <Card
+            id="promo-codes"
+            padding="lg"
+            radius="xl"
+            className="lg:col-span-2 scroll-mt-24"
+          >
             <header className="mb-3 flex items-center justify-between">
-              <h3 className="text-title-md font-semibold text-ink">
-                Codes promo
-              </h3>
+              <div>
+                <h3 className="text-title-md font-semibold text-ink">
+                  Codes promo
+                </h3>
+                <p className="text-body-sm text-ink-muted">
+                  Active, désactive ou modifie les points et les dates. Le nom
+                  ne peut pas être changé.
+                </p>
+              </div>
               <Badge variant="primary">{getListCodes.length}</Badge>
             </header>
-            <ul className="flex flex-col gap-2.5 max-h-64 overflow-y-auto scrollbar-thin pr-1">
+            <ul className="flex flex-col gap-2.5 max-h-96 overflow-y-auto scrollbar-thin pr-1">
               {loading
                 ? Array.from({ length: 4 }).map((_, i) => (
                     <li key={i} className="flex items-center justify-between">
@@ -277,18 +333,8 @@ const Dashboard = () => {
                       <Skeleton width={48} height={14} />
                     </li>
                   ))
-                : getListCodes.map((code, idx) => (
-                    <li
-                      key={code._id || code.code || idx}
-                      className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 dark:bg-secondary-800"
-                    >
-                      <span className="font-medium text-ink truncate">
-                        {code.code}
-                      </span>
-                      <Badge variant="primary" size="sm">
-                        +{code.point} pts
-                      </Badge>
-                    </li>
+                : getListCodes.map((code) => (
+                    <PromoCodeItem key={code._id} code={code} />
                   ))}
             </ul>
           </Card>
@@ -349,7 +395,8 @@ const Dashboard = () => {
                   Challenges par catégorie
                 </h3>
                 <p className="text-body-sm text-ink-muted">
-                  Détail des challenges disponibles côté application
+                  Progression vers l&apos;objectif de{" "}
+                  {CHALLENGES_PER_CATEGORY_TARGET} challenges par catégorie
                 </p>
               </div>
               <Button
@@ -374,24 +421,35 @@ const Dashboard = () => {
                 },
                 {
                   key: "total",
-                  label: "Total",
+                  label: "Challenges",
                   render: (value) => (
-                    <Badge variant="primary" size="md">
-                      {value} challenges
-                    </Badge>
+                    <span className="whitespace-nowrap text-body-md text-ink">
+                      <span className="font-semibold">{value}</span>
+                      <span className="text-ink-muted">
+                        {`\u00a0/\u00a0${CHALLENGES_PER_CATEGORY_TARGET}`}
+                      </span>
+                    </span>
                   ),
                 },
                 {
-                  key: "incomplete",
-                  label: "À compléter",
-                  render: (value) =>
-                    value > 0 ? (
-                      <Badge variant="tertiary" size="md" dot>
-                        {value} restant{value > 1 ? "s" : ""}
+                  key: "progress",
+                  label: "Progression",
+                  render: (value, row) => (
+                    <div className="flex min-w-40 items-center gap-3">
+                      <ProgressBar
+                        value={value}
+                        tone={value >= 100 ? "success" : "primary"}
+                        label={`Progression ${row.category}`}
+                      />
+                      <Badge
+                        variant={value >= 100 ? "success" : "primary"}
+                        size="sm"
+                        className="shrink-0"
+                      >
+                        {`${value}\u00a0%`}
                       </Badge>
-                    ) : (
-                      <span className="text-body-sm text-ink-muted">—</span>
-                    ),
+                    </div>
+                  ),
                 },
                 {
                   key: "actions",

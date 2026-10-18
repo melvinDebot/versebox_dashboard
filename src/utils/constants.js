@@ -11,6 +11,8 @@ export const CHALLENGE_CATEGORIES = [
   { value: "professionnel", label: "Professionnel" },
 ];
 
+export const CHALLENGES_PER_CATEGORY_TARGET = 360;
+
 export const USER_CATEGORIES = [
   { value: "amour", label: "Amour" },
   { value: "familial", label: "Familial" },

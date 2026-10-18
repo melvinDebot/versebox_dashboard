@@ -76,6 +76,9 @@ export const totalChallenges = (challengesByCategory) => {
   );
 };
 
+export const progressPercent = (count, target) =>
+  target > 0 ? Math.round((count / target) * 100) : 0;
+
 export const CATEGORY_LABELS = [
   "Spiritualité",
   "Motivation",
