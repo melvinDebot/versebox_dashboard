@@ -24,6 +24,13 @@ import {
 } from "../ui";
 import { CHALLENGES_PER_CATEGORY_TARGET } from "../utils/constants";
 import {
+  PROMO_CODES_FLAG,
+  THEME_FLAGS,
+  activeThemeKeys,
+  buildThemePatch,
+  isFlagOn,
+} from "../utils/featureFlags";
+import {
   countUsersByCategory,
   countGenders,
   calculateAgeRanges,
@@ -47,7 +54,8 @@ const STAT_CARDS = [
     title: "Challenges",
     icon: "Sparkles",
     accent: "tertiary",
-    pickValue: ({ challengesByCategory }) => totalChallenges(challengesByCategory),
+    pickValue: ({ challengesByCategory }) =>
+      totalChallenges(challengesByCategory),
     pickTarget: ({ challengesByCategory }) =>
       Object.keys(challengesByCategory || {}).length *
       CHALLENGES_PER_CATEGORY_TARGET,
@@ -130,15 +138,99 @@ StatCard.propTypes = {
   loading: PropTypes.bool,
 };
 
+const ThemePicker = ({ featuresFlag, onSelect }) => {
+  const active = activeThemeKeys(featuresFlag);
+  const current = active.length === 1 ? active[0] : null;
+  const options = [
+    {
+      key: null,
+      label: "Aucun",
+      icon: "CircleOff",
+      description: "Apparence habituelle",
+    },
+    ...THEME_FLAGS,
+  ];
+
+  return (
+    <div className="flex flex-col gap-3">
+      {active.length > 1 && (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-lg bg-warning-50 px-3 py-2 text-caption text-warning-900 dark:bg-warning-900/30 dark:text-warning-300"
+        >
+          <Icon name="TriangleAlert" size="sm" className="mt-px shrink-0" />
+          Plusieurs thèmes sont actifs. Choisis celui à garder.
+        </p>
+      )}
+      <div
+        role="radiogroup"
+        aria-label="Thème de l'application"
+        className="grid gap-2"
+      >
+        {options.map((option) => {
+          const selected =
+            active.length > 1
+              ? active.includes(option.key)
+              : option.key === current;
+          return (
+            <button
+              key={option.key ?? "none"}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onSelect(option.key)}
+              className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
+                selected
+                  ? "border-primary-400 bg-primary-50/60 dark:border-primary-400 dark:bg-primary-900/20"
+                  : "border-neutral-200 hover:border-primary-300 hover:bg-neutral-50 dark:border-secondary-500 dark:hover:bg-secondary-600"
+              }`}
+            >
+              <span
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                  selected
+                    ? "bg-primary-500 text-white"
+                    : "bg-neutral-100 text-ink-muted dark:bg-secondary-600"
+                }`}
+              >
+                <Icon name={option.icon} size="sm" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-body-md font-medium text-ink">
+                  {option.label}
+                </span>
+                <span className="text-body-sm text-ink-muted">
+                  {option.description}
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                  selected
+                    ? "border-primary-500"
+                    : "border-neutral-300 dark:border-secondary-400"
+                }`}
+              >
+                {selected && (
+                  <span className="h-2.5 w-2.5 rounded-full bg-primary-500" />
+                )}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+ThemePicker.propTypes = {
+  featuresFlag: PropTypes.object,
+  onSelect: PropTypes.func.isRequired,
+};
+
 const Dashboard = () => {
   const firebase = useFirebase();
-  const {
-    users,
-    featuresFlag,
-    getListCodes,
-    challengesByCategory,
-    loading,
-  } = firebase;
+  const { users, featuresFlag, getListCodes, challengesByCategory, loading } =
+    firebase;
   const navigate = useNavigate();
   const { hash } = useLocation();
   const [creatingPromo, setCreatingPromo] = useState(false);
@@ -147,7 +239,9 @@ const Dashboard = () => {
     const { committed } = await runTransaction(
       ref(db, `promoCodes/${name}`),
       (current) =>
-        current === null ? { points, startsAt, endsAt, isActive: true } : undefined,
+        current === null
+          ? { points, startsAt, endsAt, isActive: true }
+          : undefined,
     );
     if (!committed) throw new Error("Ce code existe déjà.");
     setCreatingPromo(false);
@@ -160,20 +254,22 @@ const Dashboard = () => {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [hash, loading]);
 
-  const updateFeaturesFlag = (patch) => {
-    update(ref(db, "featuresFlag"), patch);
+  const selectTheme = (key) => {
+    update(ref(db, "featuresFlag"), buildThemePatch(key));
   };
 
-  const flags = [
-    {
-      key: "promoCodes",
-      label: "Codes promo",
-      description: "Saisie des codes promo",
-      checked: Boolean(featuresFlag?.promoCodes),
-      onChange: (checked) => updateFeaturesFlag({ promoCodes: checked }),
-    },
-  ];
-  const activeFlags = flags.filter((flag) => flag.checked).length;
+  const togglePromoCodes = (checked) => {
+    update(ref(db, "featuresFlag"), { [PROMO_CODES_FLAG]: checked });
+  };
+
+  const promoEnabled = isFlagOn(featuresFlag, PROMO_CODES_FLAG);
+  const activeThemes = activeThemeKeys(featuresFlag);
+  const activeThemeLabel =
+    activeThemes.length === 1
+      ? THEME_FLAGS.find((theme) => theme.key === activeThemes[0]).label
+      : activeThemes.length > 1
+        ? "Conflit"
+        : "Aucun";
 
   const challengeRows = Object.entries(challengesByCategory || {}).map(
     ([category, list]) => {
@@ -209,7 +305,9 @@ const Dashboard = () => {
                 Bienvenue sur Versebox
               </h1>
               <p className="mt-3 max-w-xl text-body-lg text-neutral-300 dark:text-neutral-600">
-                {"Pilote tes challenges, événements et boutique en un coup d'œil."}
+                {
+                  "Pilote tes challenges, événements et boutique en un coup d'œil."
+                }
                 Active ou désactive les fonctionnalités côté app mobile en temps
                 réel.
               </p>
@@ -249,7 +347,11 @@ const Dashboard = () => {
               {[
                 { label: "Utilisateurs", icon: "Users", to: "/tables-user" },
                 { label: "Boutique", icon: "ShoppingBag", to: "/tables-store" },
-                { label: "Événements", icon: "CalendarHeart", to: "/tables-event" },
+                {
+                  label: "Événements",
+                  icon: "CalendarHeart",
+                  to: "/tables-event",
+                },
               ].map((item) => (
                 <button
                   key={item.to}
@@ -292,32 +394,30 @@ const Dashboard = () => {
 
         <section className="grid gap-4 lg:grid-cols-3">
           <Card padding="lg" radius="xl">
-            <header className="mb-2 flex items-start justify-between gap-3">
+            <header className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-title-md font-semibold text-ink">
-                  Feature flags
+                  Thème de l&apos;app
                 </h3>
                 <p className="text-body-sm text-ink-muted">
-                  Active ou désactive les fonctionnalités de l&apos;application
-                  mobile en temps réel
+                  Un seul thème saisonnier à la fois, appliqué en temps réel
                 </p>
               </div>
-              <Badge variant={activeFlags > 0 ? "success" : "neutral"} dot>
-                {activeFlags}/{flags.length} actifs
+              <Badge
+                variant={
+                  activeThemes.length > 1
+                    ? "warning"
+                    : activeThemes.length === 1
+                      ? "success"
+                      : "neutral"
+                }
+                dot
+                className="shrink-0"
+              >
+                {activeThemeLabel}
               </Badge>
             </header>
-            <div className="mt-5 grid gap-4">
-              {flags.map((flag) => (
-                <Toggle
-                  key={flag.key}
-                  id={`feature-flag-${flag.key}`}
-                  label={flag.label}
-                  description={flag.description}
-                  checked={flag.checked}
-                  onChange={flag.onChange}
-                />
-              ))}
-            </div>
+            <ThemePicker featuresFlag={featuresFlag} onSelect={selectTheme} />
           </Card>
 
           <Card
@@ -350,6 +450,28 @@ const Dashboard = () => {
                 )}
               </div>
             </header>
+            <div
+              className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3 ${
+                promoEnabled
+                  ? "bg-success-50 dark:bg-success-900/20"
+                  : "bg-neutral-100 dark:bg-secondary-600/60"
+              }`}
+            >
+              <Toggle
+                id="feature-flag-promoCodes"
+                label="Codes promo dans l'app"
+                description={
+                  promoEnabled
+                    ? "Les utilisateurs peuvent saisir un code"
+                    : "Saisie masquée : aucun code n'est utilisable"
+                }
+                checked={promoEnabled}
+                onChange={togglePromoCodes}
+              />
+              <Badge variant={promoEnabled ? "success" : "neutral"} dot>
+                {promoEnabled ? "Visible" : "Masqué"}
+              </Badge>
+            </div>
             {creatingPromo && (
               <div className="mb-3 rounded-xl border border-primary-200 bg-primary-50/40 p-4 dark:border-primary-900/60 dark:bg-primary-900/10">
                 <p className="mb-3 text-body-md font-semibold text-ink">
