@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ref, remove } from "firebase/database";
 import PropTypes from "prop-types";
 import { db } from "../../firebase";
 import DefaultLayout from "../layout/DefaultLayout";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import ExportEmailsDialog from "../components/ExportEmailsDialog/ExportEmailsDialog";
 import { useFirebase } from "../context/FirebaseContext";
 import { Card, DataTable, Button, Badge, Avatar, Icon } from "../ui";
 
@@ -45,6 +46,8 @@ CopyButton.propTypes = {
 const Users = () => {
   const { users, loading } = useFirebase();
   const navigate = useNavigate();
+  const [exportOpen, setExportOpen] = useState(false);
+  const closeExport = useCallback(() => setExportOpen(false), []);
 
   const handleDelete = (uuid) => {
     if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
@@ -70,6 +73,21 @@ const Users = () => {
       <Breadcrumb
         pageName="Utilisateurs"
         description={`${users.length} utilisateurs inscrits sur Versebox`}
+        action={
+          <Button
+            variant="primary"
+            leftIcon="Download"
+            disabled={loading || users.length === 0}
+            onClick={() => setExportOpen(true)}
+          >
+            Exporter les emails
+          </Button>
+        }
+      />
+      <ExportEmailsDialog
+        open={exportOpen}
+        users={users}
+        onClose={closeExport}
       />
       <Card padding="lg" radius="xl">
         <DataTable
